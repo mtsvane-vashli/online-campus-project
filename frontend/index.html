@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>オンラインキャンパス体験 - プロトタイプ</title>
+    <style>
+        body { margin: 0; }
+        canvas { display: block; }
+        #instructions {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            color: white;
+            background-color: rgba(0, 0, 0, 0.5);
+            padding: 10px;
+            border-radius: 5px;
+            font-family: sans-serif;
+        }
+    </style>
+</head>
+<body>
+    <div id="instructions">
+        <b>操作方法:</b><br>
+        W / A / S / D : 移動<br>
+        マウス: カメラ視点操作<br>
+        クリック: カーソルロック
+    </div>
+
+    <div id="interaction-prompt" style="display: none;">
+        [E]キーで詳細を見る
+    </div>
+    <div id="info-panel" style="display: none;">
+        <div id="info-panel-content">
+            <h2>〇〇学部 1号館</h2>
+            <p>ここは〇〇学部のメインの建物です。講義室や研究室が集まっています。1階には学生ラウンジがあり、休憩や自習に利用できます。</p>
+            </div>
+        <button id="info-panel-close">閉じる</button>
+    </div>
+    <style>
+        body { margin: 0; }
+        canvas { display: block; }
+        #instructions {
+            position: absolute;
+            top: 10px; left: 10px; color: white;
+            background-color: rgba(0,0,0,0.5); padding: 10px; border-radius: 5px;
+            font-family: sans-serif; z-index: 10;
+        }
+        /* ▼▼▼ ここからCSSを追加 ▼▼▼ */
+        #interaction-prompt {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            color: white; font-size: 24px; font-weight: bold;
+            background-color: rgba(0,0,0,0.7);
+            padding: 15px 25px; border-radius: 10px;
+            font-family: sans-serif; text-shadow: 2px 2px 4px #000;
+            z-index: 10;
+        }
+        #info-panel {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80%; max-width: 500px;
+            background-color: rgba(255,255,255,0.9);
+            border: 1px solid #ccc; border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            padding: 20px; font-family: sans-serif;
+            z-index: 20;
+        }
+        #info-panel-close {
+            position: absolute;
+            top: 10px; right: 10px;
+            background: #333; color: white;
+            border: none; border-radius: 50%;
+            width: 30px; height: 30px;
+            font-size: 16px; cursor: pointer;
+        }
+        #info-panel-close:hover { background: #555; }
+        #chat-open-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            background-color: #007bff;
+            border: none;
+            border-radius: 50%;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 999;
+        }
+        #chat-open-btn:hover {
+            background-color: #0056b3;
+        }
+        #chat-open-btn img {
+            width: 30px;
+            height: 30px;
+        }
+
+        #chat-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 350px;
+            height: 500px;
+            background-color: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            z-index: 1000;
+        }
+        #chat-container.hidden {
+            display: none;
+        }
+
+        #chat-header {
+            background-color: #007bff;
+            color: white;
+            padding: 10px;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        #chat-close-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        #chat-messages {
+            flex-grow: 1;
+            padding: 10px;
+            overflow-y: auto;
+            background-color: #f4f4f4;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .message {
+            padding: 8px 12px;
+            border-radius: 18px;
+            max-width: 80%;
+            word-wrap: break-word;
+        }
+        .bot-message {
+            background-color: #e9e9eb;
+            align-self: flex-start;
+        }
+        .user-message {
+            background-color: #007bff;
+            color: white;
+            align-self: flex-end;
+        }
+
+        #chat-input-area {
+            display: flex;
+            padding: 10px;
+            border-top: 1px solid #ccc;
+        }
+        #chat-input {
+            flex-grow: 1;
+            border: 1px solid #ccc;
+            border-radius: 18px;
+            padding: 8px 12px;
+        }
+        #chat-send-btn {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 18px;
+            padding: 8px 15px;
+            margin-left: 10px;
+            cursor: pointer;
+        }
+        #chat-send-btn:hover {
+            background-color: #0056b3;
+        }
+    </style>
+
+    <div id="chat-container" class="hidden">
+        <div id="chat-header">
+            <span>AIチャットボット</span>
+            <button id="chat-close-btn">×</button>
+        </div>
+        <div id="chat-messages">
+            <div class="message bot-message">こんにちは！九州大学のことで何か質問はありますか？</div>
+        </div>
+        <div id="chat-input-area">
+            <input type="text" id="chat-input" placeholder="質問を入力...">
+            <button id="chat-send-btn">送信</button>
+        </div>
+    </div>
+
+    <button id="chat-open-btn">
+        <img src="https://www.gstatic.com/images/icons/material/system/2x/chat_bubble_white_24dp.png" alt="Chat Icon">
+    </button>
+
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://unpkg.com/three@0.165.0/build/three.module.js",
+            "three/addons/": "https://unpkg.com/three@0.165.0/examples/jsm/",
+            "cannon-es": "https://unpkg.com/cannon-es@0.20.0/dist/cannon-es.js"
+        }
+    }
+    </script>
+    <script type="module" src="./main.js"></script>
+</body>
+</html>
