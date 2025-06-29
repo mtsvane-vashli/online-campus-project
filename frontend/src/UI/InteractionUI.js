@@ -6,7 +6,6 @@ export class InteractionUI {
         
         this.interactionPrompt = document.getElementById('interaction-prompt');
         this.infoPanel = document.getElementById('info-panel');
-        this.infoPanelClose = document.getElementById('info-panel-close');
 
         this.isNearInfoBox = false;
         this.interactionDistance = 5;
@@ -15,7 +14,6 @@ export class InteractionUI {
     }
 
     setupEventListeners() {
-        this.infoPanelClose.addEventListener('click', () => this.closePanel());
         document.addEventListener('keydown', (e) => {
             if (e.key.toLowerCase() === 'e' && this.isNearInfoBox) {
                 this.togglePanel();
@@ -26,10 +24,6 @@ export class InteractionUI {
     togglePanel() {
         const isPanelVisible = this.infoPanel.style.display === 'block';
         this.infoPanel.style.display = isPanelVisible ? 'none' : 'block';
-    }
-
-    closePanel() {
-        this.infoPanel.style.display = 'none';
     }
 
     update() {
@@ -43,6 +37,7 @@ export class InteractionUI {
             }
         } else {
             this.isNearInfoBox = false;
+            this.infoPanel.style.display = 'none';
             this.interactionPrompt.style.display = 'none';
         }
     }

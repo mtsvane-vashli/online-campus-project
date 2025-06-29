@@ -35,7 +35,6 @@
             <h2>〇〇学部 1号館</h2>
             <p>ここは〇〇学部のメインの建物です。講義室や研究室が集まっています。1階には学生ラウンジがあり、休憩や自習に利用できます。</p>
             </div>
-        <button id="info-panel-close">閉じる</button>
     </div>
     <style>
         body { margin: 0; }
@@ -46,10 +45,9 @@
             background-color: rgba(0,0,0,0.5); padding: 10px; border-radius: 5px;
             font-family: sans-serif; z-index: 10;
         }
-        /* ▼▼▼ ここからCSSを追加 ▼▼▼ */
         #interaction-prompt {
             position: absolute;
-            top: 50%; left: 50%;
+            top: 10%; left: 50%;
             transform: translate(-50%, -50%);
             color: white; font-size: 24px; font-weight: bold;
             background-color: rgba(0,0,0,0.7);
@@ -59,7 +57,7 @@
         }
         #info-panel {
             position: absolute;
-            top: 50%; left: 50%;
+            top: 20%; left: 50%;
             transform: translate(-50%, -50%);
             width: 80%; max-width: 500px;
             background-color: rgba(255,255,255,0.9);
