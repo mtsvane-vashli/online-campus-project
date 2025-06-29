@@ -1,11 +1,12 @@
 // src/World/World.js
 import * as THREE from 'three';
 import * as CANNON from 'cannon-es';
-import { createEnvironment } from './environment.js';
+import { createCampusEnvironment } from './environment.js';
 import { Character } from './models/Character.js';
-import { InfoBox } from './models/InfoBox.js';
+// import { InfoBox } from './models/InfoBox.js';
 import { Chat } from '../UI/Chat.js';
-import { InteractionUI } from '../UI/InteractionUI.js';
+// import { InteractionUI } from '../UI/InteractionUI.js';
+//import CannonDebugger from './utils/cannon-debugger.js'; // デバッガーをインポート
 
 export class World {
     constructor() {
@@ -28,28 +29,23 @@ export class World {
         this.infoBox = null;
         this.interactionUI = null;
         this.chat = null;
+        this.debugger = null; // デバッガー用のプロパティを追加
     }
 
-    init() {
-        // Renderer setup
+    async init() {
         this.renderer.setSize(window.innerWidth, window.innerHeight);
         this.renderer.setClearColor(0x87ceeb);
         this.renderer.shadowMap.enabled = true;
         document.body.appendChild(this.renderer.domElement);
 
-        // Create world components
-        createEnvironment(this.scene, this.physicsWorld);
+        await createCampusEnvironment(this.scene, this.physicsWorld); 
         this.character = new Character(this.scene, this.physicsWorld);
-        this.infoBox = new InfoBox(this.scene, this.physicsWorld);
         
-        // UI
         this.chat = new Chat();
-        this.interactionUI = new InteractionUI(this.character, this.infoBox);
-
-        // Setup event listeners
-        this.setupEventListeners();
         
-        // Start animation loop
+        //this.debugger = CannonDebugger(this.scene, this.physicsWorld);
+
+        this.setupEventListeners();
         this.animate();
     }
 
@@ -80,14 +76,20 @@ export class World {
         const delta = this.clock.getDelta();
         this.physicsWorld.step(1/60, delta, 3);
         
+        /*
+        if (this.debugger) {
+            this.debugger.update();
+        }
+        */
+
         if (this.character) {
             this.character.update(delta, this.keys, this.camera);
             this.updateCamera();
         }
 
-        if(this.interactionUI) {
-            this.interactionUI.update();
-        }
+        // if(this.interactionUI) {
+        //     this.interactionUI.update();
+        // }
 
         this.renderer.render(this.scene, this.camera);
     }
