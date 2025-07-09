@@ -12,8 +12,17 @@ export async function createCampusEnvironment(scene, world) {
     const directionalLight = new THREE.DirectionalLight(0xffffff, 1.5);
     directionalLight.position.set(10, 50, 20); // ライトの位置を調整
     directionalLight.castShadow = true;
-    directionalLight.shadow.mapSize.width = 2048; // 影の解像度を上げる
-    directionalLight.shadow.mapSize.height = 2048;
+    directionalLight.shadow.mapSize.width = 4096; // 影の解像度を上げる
+    directionalLight.shadow.mapSize.height = 4096;
+
+    // 影のカメラの範囲を調整
+    directionalLight.shadow.camera.left = 0; // 左端
+    directionalLight.shadow.camera.right = 0; // 右端
+    directionalLight.shadow.camera.top = 0; // 上端
+    directionalLight.shadow.camera.bottom = 0; // 下端
+    directionalLight.shadow.camera.near = 0.5; // 影の開始距離
+    directionalLight.shadow.camera.far = 200; // 影の終了距離
+
     scene.add(directionalLight);
 
     const PHYSICS_Y_OFFSET = 0; // この数値を調整します (例: -0.2 や 0.1 など)
