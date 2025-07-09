@@ -25,9 +25,6 @@ export async function createCampusEnvironment(scene, world) {
 
     scene.add(directionalLight);
 
-    const PHYSICS_Y_OFFSET = 0; // この数値を調整します (例: -0.2 や 0.1 など)
-    const PHYSICS_SCALE_MULTIPLIER = 12; // スケールの微調整用 (例: 0.99, 1.01)
-
     // Campus Model Loading
     const loader = new GLTFLoader();
     try {
