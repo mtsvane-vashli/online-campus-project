@@ -3,9 +3,9 @@ import * as THREE from 'three';
 import * as CANNON from 'cannon-es';
 import { createCampusEnvironment } from './environment.js';
 import { Character } from './models/Character.js';
-// import { InfoBox } from './models/InfoBox.js';
+import { InfoBox } from './models/InfoBox.js';
 import { Chat } from '../UI/Chat.js';
-// import { InteractionUI } from '../UI/InteractionUI.js';
+import { InteractionUI } from '../UI/InteractionUI.js';
 //import CannonDebugger from './utils/cannon-debugger.js'; // デバッガーをインポート
 
 export class World {
@@ -40,8 +40,24 @@ export class World {
 
         await createCampusEnvironment(this.scene, this.physicsWorld); 
         this.character = new Character(this.scene, this.physicsWorld);
+
+        // --- 情報ポイントの作成 ---
+        this.infoBoxes = [
+            new InfoBox(this.scene, this.physicsWorld, {
+                position: new THREE.Vector3(10, 1.5, 5), // ← Pキーで調べた座標に置き換える
+                title: '中央図書館',
+                text: '九州大学の中央図書館です。豊富な蔵書と静かな学習スペースが魅力です。'
+            }),
+            new InfoBox(this.scene, this.physicsWorld, {
+                position: new THREE.Vector3(1, 0, -6), // ← Pキーで調べた座標に置き換える
+                color: 0x00ff00,
+                title: '理学部棟',
+                text: 'ここは理学部の建物です。最先端の研究が行われています。'
+            })
+        ];
         
         this.chat = new Chat();
+        this.interactionUI = new InteractionUI(this.character, this.infoBoxes);
         
         //this.debugger = CannonDebugger(this.scene, this.physicsWorld);
 
@@ -50,8 +66,20 @@ export class World {
     }
 
     setupEventListeners() {
-        document.addEventListener('keydown', (e) => this.keys[e.key.toLowerCase()] = true);
-        document.addEventListener('keyup', (e) => this.keys[e.key.toLowerCase()] = false);
+        document.addEventListener('keydown', (e) => {
+            const key = e.key.toLowerCase();
+            this.keys[key] = true;
+
+            // 'P'キーでキャラクターの現在位置をコンソールに出力する
+            if (key === 'p') {
+                const pos = this.character.body.position;
+                console.log(`Character Position: { x: ${pos.x.toFixed(2)}, y: ${pos.y.toFixed(2)}, z: ${pos.z.toFixed(2)} }`);
+            }
+        });
+
+        document.addEventListener('keyup', (e) => {
+            this.keys[e.key.toLowerCase()] = false;
+        });
         
         document.body.addEventListener('click', () => { document.body.requestPointerLock(); });
         
@@ -88,9 +116,9 @@ export class World {
             this.updateCamera();
         }
 
-        // if(this.interactionUI) {
-        //     this.interactionUI.update();
-        // }
+        if(this.interactionUI) {
+            this.interactionUI.update();
+        }
 
         this.renderer.render(this.scene, this.camera);
     }

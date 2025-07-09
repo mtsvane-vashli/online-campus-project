@@ -25,10 +25,13 @@ export async function createCampusEnvironment(scene, world) {
 
     scene.add(directionalLight);
 
+    const PHYSICS_Y_OFFSET = 0; // この数値を調整します (例: -0.2 や 0.1 など)
+    const PHYSICS_SCALE_MULTIPLIER = 1; // 物理シミュレーションのスケール調整用
+
     // Campus Model Loading
     const loader = new GLTFLoader();
     try {
-        const gltf = await loader.loadAsync('./assets/Kyushu_University_beta1.glb');
+        const gltf = await loader.loadAsync('./assets/Kyushu_University_beta3.glb');
         const campusModel = gltf.scene;
         scene.add(campusModel);
 
