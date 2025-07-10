@@ -7,7 +7,11 @@ export class Chat {
         this.chatMessages = document.getElementById('chat-messages');
         this.chatInput = document.getElementById('chat-input');
         this.chatSendBtn = document.getElementById('chat-send-btn');
-        
+
+        const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+        // 下のURLを、あなたのRenderサービスのURLに置き換えてください
+        this.backendUrl = isLocal ? 'http://localhost:3000/chat' : 'https://online-campus-project.onrender.com/chat';
+
         this.setupEventListeners();
     }
 
@@ -41,7 +45,7 @@ export class Chat {
         this.chatInput.value = '';
 
         try {
-            const response = await fetch('http://localhost:3000/chat', {
+            const response = await fetch(this.backendUrl, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ message: messageText }),
