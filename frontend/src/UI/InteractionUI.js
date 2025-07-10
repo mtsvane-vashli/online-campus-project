@@ -11,7 +11,8 @@ export class InteractionUI {
         this.infoPanelText = document.querySelector('#info-panel-content p');
 
 
-        this.activeInfoBox = null; // 現在アクティブな情報ボックス
+        this.activeInfoBox = null; // 現在操作可能な最も近い情報ボックス
+        this.openedInfoBox = null; // 現在開いている情報ボックス
         this.interactionDistance = 5;
 
         this.setupEventListeners();
@@ -44,18 +45,27 @@ export class InteractionUI {
     openPanel() {
         if (!this.activeInfoBox) return;
         // アクティブなInfoBoxの情報をパネルに設定
-        this.infoPanelTitle.textContent = this.activeInfoBox.title;
-        this.infoPanelText.textContent = this.activeInfoBox.text;
+        this.openedInfoBox = this.activeInfoBox;
+        this.infoPanelTitle.textContent = this.openedInfoBox.title;
+        this.infoPanelText.textContent = this.openedInfoBox.text;
         this.infoPanel.style.display = 'block';
         this.interactionPrompt.style.display = 'none';
-        document.exitPointerLock(); // パネルを開くとカーソルロックを解除
     }
 
     closePanel() {
         this.infoPanel.style.display = 'none';
+        this.openedInfoBox = null;
     }
 
     update() {
+        // パネルが開いている場合、キャラクターとの距離を監視
+        if (this.openedInfoBox) {
+            const distance = this.character.body.position.distanceTo(this.openedInfoBox.body.position);
+            if (distance > this.interactionDistance) {
+                this.closePanel();
+            }
+        }
+
         let closestBox = null;
         let minDistance = this.interactionDistance;
 
@@ -69,7 +79,8 @@ export class InteractionUI {
         }
         this.activeInfoBox = closestBox;
 
-        if (this.activeInfoBox && this.infoPanel.style.display !== 'block') {
+        // パネルが開いていない状態で、かつ近くに情報ボックスがあればプロンプトを表示
+        if (this.activeInfoBox && !this.openedInfoBox) {
             this.interactionPrompt.style.display = 'block';
         } else {
             this.interactionPrompt.style.display = 'none';
