@@ -42,10 +42,8 @@ export async function createCampusEnvironment(scene, world) {
             if (node.isMesh) {
                 // メッシュ名に「_collider」が含まれているかチェック
                 if (node.name.endsWith('_collider')) {
-                    console.log(`[Debug] Processing collider mesh: ${node.name}`); // デバッグログ追加
                     // 当たり判定用のメッシュ
                     const shape = threeToCannon(node, { scale: PHYSICS_SCALE_MULTIPLIER });
-                    console.log(`[Debug] Shape created for ${node.name}:`, shape); // デバッグログ追加
                     if (shape) {
                         const body = new CANNON.Body({ mass: 0 });
                         body.addShape(shape);
