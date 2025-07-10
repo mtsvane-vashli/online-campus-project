@@ -6,7 +6,7 @@ import { Character } from './models/Character.js';
 import { InfoBox } from './models/InfoBox.js';
 import { Chat } from '../UI/Chat.js';
 import { InteractionUI } from '../UI/InteractionUI.js';
-//import CannonDebugger from './utils/cannon-debugger.js'; // デバッガーをインポート
+import CannonDebugger from './utils/cannon-debugger.js'; // デバッガーをインポート
 
 export class World {
     constructor() {
@@ -59,7 +59,7 @@ export class World {
         this.chat = new Chat();
         this.interactionUI = new InteractionUI(this.character, this.infoBoxes);
         
-        //this.debugger = CannonDebugger(this.scene, this.physicsWorld);
+        this.debugger = CannonDebugger(this.scene, this.physicsWorld);
 
         this.setupEventListeners();
         this.animate();
@@ -105,9 +105,9 @@ export class World {
         this.physicsWorld.step(1/60, delta, 3);
         
         
-        //if (this.debugger) {
-        //    this.debugger.update();
-        //}
+        if (this.debugger) {
+            this.debugger.update();
+        }
         
         
 

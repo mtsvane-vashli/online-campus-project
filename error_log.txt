@@ -1,0 +1,10 @@
+AIからの応答エラー: GoogleGenerativeAIFetchError: [GoogleGenerativeAI Error]: Error fetching from https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent: [503 Service Unavailable] The model is overloaded. Please try again later.
+    at handleResponseNotOk (C:\Users\kousu\online-campus-project\backend\node_modules\@google\generative-ai\dist\index.js:434:11)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async makeRequest (C:\Users\kousu\online-campus-project\backend\node_modules\@google\generative-ai\dist\index.js:403:9)
+    at async generateContent (C:\Users\kousu\online-campus-project\backend\node_modules\@google\generative-ai\dist\index.js:867:22)
+    at async C:\Users\kousu\online-campus-project\backend\server.js:27:24 {
+  status: 503,
+  statusText: 'Service Unavailable',
+  errorDetails: undefined
+}

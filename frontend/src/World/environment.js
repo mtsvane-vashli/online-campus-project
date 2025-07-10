@@ -31,33 +31,42 @@ export async function createCampusEnvironment(scene, world) {
     // Campus Model Loading
     const loader = new GLTFLoader();
     try {
-        const gltf = await loader.loadAsync('./assets/Kyushu_University_beta3.glb');
+        const gltf = await loader.loadAsync('./assets/Kyushu_University_beta3_2.glb');
         const campusModel = gltf.scene;
+        
+        // モデルをシーンに追加
         scene.add(campusModel);
 
-        // モデル内のすべてのメッシュに対して物理設定と影の設定を行う
+        // モデル内のメッシュをトラバースして、当たり判定と表示を分ける
         campusModel.traverse(node => {
             if (node.isMesh) {
-                // 影を有効にする
-                node.castShadow = true;
-                node.receiveShadow = true;
+                // メッシュ名に「_collider」が含まれているかチェック
+                if (node.name.endsWith('_collider')) {
+                    console.log(`[Debug] Processing collider mesh: ${node.name}`); // デバッグログ追加
+                    // 当たり判定用のメッシュ
+                    const shape = threeToCannon(node, { scale: PHYSICS_SCALE_MULTIPLIER });
+                    console.log(`[Debug] Shape created for ${node.name}:`, shape); // デバッグログ追加
+                    if (shape) {
+                        const body = new CANNON.Body({ mass: 0 });
+                        body.addShape(shape);
 
-                const shape = threeToCannon(node, { scale: PHYSICS_SCALE_MULTIPLIER });
-                if (shape) {
-                    const body = new CANNON.Body({ mass: 0 });
-                    body.addShape(shape);
-                    
-                    const worldPosition = new THREE.Vector3();
-                    const worldQuaternion = new THREE.Quaternion();
-                    node.getWorldPosition(worldPosition);
-                    node.getWorldQuaternion(worldQuaternion);
-                    
-                    // ★★★ オフセットを適用 ★★★
-                    body.position.copy(worldPosition);
-                    body.position.y += PHYSICS_Y_OFFSET;
-                    body.quaternion.copy(worldQuaternion);
-                    
-                    world.addBody(body);
+                        const worldPosition = new THREE.Vector3();
+                        const worldQuaternion = new THREE.Quaternion();
+                        node.getWorldPosition(worldPosition);
+                        node.getWorldQuaternion(worldQuaternion);
+
+                        body.position.copy(worldPosition);
+                        body.position.y += PHYSICS_Y_OFFSET;
+                        body.quaternion.copy(worldQuaternion);
+
+                        world.addBody(body);
+                    }
+                    // 当たり判定用メッシュは非表示にする
+                    node.visible = false;
+                } else {
+                    // 見た目用のメッシュ
+                    node.castShadow = true;
+                    node.receiveShadow = true;
                 }
             }
         });
