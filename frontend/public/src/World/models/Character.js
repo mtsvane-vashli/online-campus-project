@@ -34,7 +34,14 @@ export class Character {
                 this.model = gltf.scene;
                 this.model.scale.set(0.02, 0.02, 0.02);
                 this.model.traverse(node => {
-                    if (node.isMesh) node.castShadow = true;
+                    if (node.isMesh) {
+                        node.castShadow = true;
+                        const oldMaterial = node.material;
+                        node.material = new THREE.MeshToonMaterial({
+                            color: oldMaterial.color,
+                            map: oldMaterial.map,
+                        });
+                    }
                 });
                 this.scene.add(this.model);
 

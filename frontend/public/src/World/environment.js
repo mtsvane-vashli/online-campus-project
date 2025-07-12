@@ -7,19 +7,19 @@ import { threeToCannon } from './utils/three-to-cannon.js'; // 物理メッシ�
 // 非同期関数として定義
 export async function createCampusEnvironment(scene, world) {
     // Lighting (ライティング設定はそのまま)
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.5); // 少し暗くする
     scene.add(ambientLight);
-    const directionalLight = new THREE.DirectionalLight(0xffffff, 1.5);
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 1.0); // 少し暗くする
     directionalLight.position.set(10, 50, 20); // ライトの位置を調整
     directionalLight.castShadow = true;
     directionalLight.shadow.mapSize.width = 4096; // 影の解像度を上げる
     directionalLight.shadow.mapSize.height = 4096;
 
     // 影のカメラの範囲を調整
-    directionalLight.shadow.camera.left = 0; // 左端
-    directionalLight.shadow.camera.right = 0; // 右端
-    directionalLight.shadow.camera.top = 0; // 上端
-    directionalLight.shadow.camera.bottom = 0; // 下端
+    directionalLight.shadow.camera.left = -100; // 左端
+    directionalLight.shadow.camera.right = 100; // 右端
+    directionalLight.shadow.camera.top = 100; // 上端
+    directionalLight.shadow.camera.bottom = -100; // 下端
     directionalLight.shadow.camera.near = 0.5; // 影の開始距離
     directionalLight.shadow.camera.far = 200; // 影の終了距離
 
@@ -65,10 +65,17 @@ export async function createCampusEnvironment(scene, world) {
                     // 見た目用のメッシュ
                     node.castShadow = true;
                     node.receiveShadow = true;
+                    const oldMaterial = node.material;
+                    node.material = new THREE.MeshToonMaterial({
+                        color: oldMaterial.color,
+                        map: oldMaterial.map,
+                    });
                 }
             }
         });
     } catch (error) {
         console.error('キャンパスモデルの読み込みに失敗しました:', error);
     }
+
+    return directionalLight; // ライトを返す
 }

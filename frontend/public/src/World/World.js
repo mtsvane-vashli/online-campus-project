@@ -6,6 +6,7 @@ import { Character } from './models/Character.js';
 import { InfoBox } from './models/InfoBox.js';
 import { Chat } from '../UI/Chat.js';
 import { InteractionUI } from '../UI/InteractionUI.js';
+import { OutlineEffect } from './utils/OutlineEffect.js';
 //import CannonDebugger from './utils/cannon-debugger.js'; // デバッガーをインポート
 
 export class World {
@@ -30,15 +31,21 @@ export class World {
         this.interactionUI = null;
         this.chat = null;
         this.debugger = null; // デバッガー用のプロパティを追加
+        this.effect = null; // OutlineEffect
+        this.directionalLight = null; // 指向性ライト
     }
 
     async init() {
-        this.renderer.setSize(window.innerWidth, window.innerHeight);
-        this.renderer.setClearColor(0x87ceeb);
-        this.renderer.shadowMap.enabled = true;
-        document.body.appendChild(this.renderer.domElement);
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setClearColor(0x87ceeb);
+        renderer.shadowMap.enabled = true;
+        document.body.appendChild(renderer.domElement);
+        this.renderer = renderer;
 
-        await createCampusEnvironment(this.scene, this.physicsWorld); 
+        this.effect = new OutlineEffect(this.renderer);
+
+        this.directionalLight = await createCampusEnvironment(this.scene, this.physicsWorld); 
         this.character = new Character(this.scene, this.physicsWorld);
 
         // --- 情報ポイントの作成 ---
@@ -114,13 +121,27 @@ export class World {
         if (this.character) {
             this.character.update(delta, this.keys, this.camera);
             this.updateCamera();
+            this.updateLight(); // ライトの更新処理を呼び出す
         }
 
         if(this.interactionUI) {
             this.interactionUI.update();
         }
 
-        this.renderer.render(this.scene, this.camera);
+        this.effect.render(this.scene, this.camera);
+    }
+    
+    updateLight() {
+        if (this.directionalLight && this.character && this.character.body) {
+            // ライトの位置をキャラクターの少し上空に設定
+            this.directionalLight.position.x = this.character.body.position.x + 10;
+            this.directionalLight.position.y = this.character.body.position.y + 50;
+            this.directionalLight.position.z = this.character.body.position.z + 20;
+
+            // ライトのターゲット（注視点）をキャラクターの位置に設定
+            this.directionalLight.target.position.copy(this.character.body.position);
+            this.directionalLight.target.updateMatrixWorld(); // ターゲットのワールド座標を更新
+        }
     }
     
     updateCamera() {
