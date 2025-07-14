@@ -1,7 +1,7 @@
 // src/World/environment.js
 import * as THREE from 'three';
 import * as CANNON from 'cannon-es';
-import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { threeToCannon } from './utils/three-to-cannon.js'; // 物理メッシュ変換用のヘルパー
 
 // 非同期関数として定義
@@ -31,7 +31,7 @@ export async function createCampusEnvironment(scene, world) {
     // Campus Model Loading
     const loader = new GLTFLoader();
     try {
-        const gltf = await loader.loadAsync('/frontend/assets/Kyushu_University_beta4.glb');
+        const gltf = await loader.loadAsync('/assets/Kyushu_University_beta4.glb');
         const campusModel = gltf.scene;
         
         // モデルをシーンに追加

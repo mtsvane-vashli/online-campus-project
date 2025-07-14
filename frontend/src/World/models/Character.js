@@ -1,7 +1,7 @@
 // src/World/models/Character.js
 import * as THREE from 'three';
 import * as CANNON from 'cannon-es';
-import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 
 export class Character {
     constructor(scene, world) {
@@ -29,7 +29,7 @@ export class Character {
     loadModel() {
         const loader = new GLTFLoader();
         loader.load(
-            '/frontend/assets/fox.glb',
+            '/assets/fox.glb',
             (gltf) => {
                 this.model = gltf.scene;
                 this.model.scale.set(0.02, 0.02, 0.02);
