@@ -29,7 +29,7 @@ export class Character {
     loadModel() {
         const loader = new GLTFLoader();
         loader.load(
-            './assets/fox.glb',
+            '/frontend/assets/fox.glb',
             (gltf) => {
                 this.model = gltf.scene;
                 this.model.scale.set(0.02, 0.02, 0.02);

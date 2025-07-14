@@ -1,10 +1,37 @@
-AIからの応答エラー: GoogleGenerativeAIFetchError: [GoogleGenerativeAI Error]: Error fetching from https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent: [503 Service Unavailable] The model is overloaded. Please try again later.
-    at handleResponseNotOk (C:\Users\kousu\online-campus-project\backend\node_modules\@google\generative-ai\dist\index.js:434:11)
-    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
-    at async makeRequest (C:\Users\kousu\online-campus-project\backend\node_modules\@google\generative-ai\dist\index.js:403:9)
-    at async generateContent (C:\Users\kousu\online-campus-project\backend\node_modules\@google\generative-ai\dist\index.js:867:22)
-    at async C:\Users\kousu\online-campus-project\backend\server.js:27:24 {
-  status: 503,
-  statusText: 'Service Unavailable',
-  errorDetails: undefined
-}
+environment.js:77 
+ キャンパスモデルの読み込みに失敗しました: HttpError: fetch for "http://127.0.0.1:5500/assets/Kyushu_University_beta4.glb" responded with 404: Not Found
+    at three.module.js:43956:12
+createCampusEnvironment	@	environment.js:77
+await in createCampusEnvironment		
+init	@	World.js:48
+main	@	main.js:6
+(anonymous)	@	main.js:9
+[NEW] Explain Console errors by using Copilot in Edge: click 
+ to explain an error. Learn more
+Don't show again
+three.module.js:43877 
+ 
+ GET http://127.0.0.1:5500/assets/fox.glb 404 (Not Found)
+load	@	three.module.js:43877
+load	@	GLTFLoader.js:241
+loadModel	@	Character.js:31
+Character	@	Character.js:26
+init	@	World.js:49
+await in init		
+main	@	main.js:6
+(anonymous)	@	main.js:9
+GLTFLoader.js:225 
+ HttpError: fetch for "http://127.0.0.1:5500/assets/fox.glb" responded with 404: Not Found
+    at three.module.js:43956:12
+_onError	@	GLTFLoader.js:225
+(anonymous)	@	three.module.js:44043
+Promise.catch		
+load	@	three.module.js:44024
+load	@	GLTFLoader.js:241
+loadModel	@	Character.js:31
+Character	@	Character.js:26
+init	@	World.js:49
+await in init		
+main	@	main.js:6
+(anonymous)	@	main.js:9
+﻿
