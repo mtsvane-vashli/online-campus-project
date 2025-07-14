@@ -1,43 +1,4 @@
-GET https://online-campus-project.vercel.app/assets/Kyushu_University_beta4.glb 404 (Not Found)
-load @ index-BZzi9ygw.js:44
-load @ index-BZzi9ygw.js:3827
-(anonymous) @ index-BZzi9ygw.js:44
-loadAsync @ index-BZzi9ygw.js:44
-Ry @ index-BZzi9ygw.js:3827
-init @ index-BZzi9ygw.js:3829
-Dy @ index-BZzi9ygw.js:3829
-(anonymous) @ index-BZzi9ygw.js:3829
-index-BZzi9ygw.js:3827  キャンパスモデルの読み込みに失敗しました: of: fetch for "https://online-campus-project.vercel.app/assets/Kyushu_University_beta4.glb" responded with 404: 
-    at https://online-campus-project.vercel.app/assets/index-BZzi9ygw.js:44:52333
-Ry @ index-BZzi9ygw.js:3827
-await in Ry
-init @ index-BZzi9ygw.js:3829
-Dy @ index-BZzi9ygw.js:3829
-(anonymous) @ index-BZzi9ygw.js:3829
-[NEW] Explain Console errors by using Copilot in Edge: click
-         
-         to explain an error. 
-        Learn more
-        Don't show again
-index-BZzi9ygw.js:44   GET https://online-campus-project.vercel.app/assets/fox.glb 404 (Not Found)
-load @ index-BZzi9ygw.js:44
-load @ index-BZzi9ygw.js:3827
-loadModel @ index-BZzi9ygw.js:3827
-Cy @ index-BZzi9ygw.js:3827
-init @ index-BZzi9ygw.js:3829
-await in init
-Dy @ index-BZzi9ygw.js:3829
-(anonymous) @ index-BZzi9ygw.js:3829
-index-BZzi9ygw.js:3827  of: fetch for "https://online-campus-project.vercel.app/assets/fox.glb" responded with 404: 
-    at https://online-campus-project.vercel.app/assets/index-BZzi9ygw.js:44:52333
-a @ index-BZzi9ygw.js:3827
-(anonymous) @ index-BZzi9ygw.js:44
-Promise.catch
-load @ index-BZzi9ygw.js:44
-load @ index-BZzi9ygw.js:3827
-loadModel @ index-BZzi9ygw.js:3827
-Cy @ index-BZzi9ygw.js:3827
-init @ index-BZzi9ygw.js:3829
-await in init
-Dy @ index-BZzi9ygw.js:3829
-(anonymous) @ index-BZzi9ygw.js:3829
+Uncaught TypeError: this.cameraOffset.clone(...).normalize(...).scale is not a function
+    at World.updateCamera (World.js:154:90)
+    at World.animate (World.js:123:18)
+    at World.js:109:42

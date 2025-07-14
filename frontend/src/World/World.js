@@ -146,9 +146,42 @@ export class World {
     
     updateCamera() {
         if (this.character && this.character.body) {
-            const cameraTarget = this.character.body.position;
-            this.camera.position.copy(cameraTarget).add(this.cameraOffset);
-            this.camera.lookAt(new THREE.Vector3(cameraTarget.x, cameraTarget.y + 1, cameraTarget.z));
+            const characterPos = this.character.body.position; // this is a CANNON.Vec3
+            const lookAtPoint = new THREE.Vector3(characterPos.x, characterPos.y + 1, characterPos.z);
+
+            // Create a normalized THREE.Vector3 from the camera offset
+            const offsetDirection = this.cameraOffset.clone().normalize();
+
+            // Calculate the desired camera position (as a THREE.Vector3)
+            const desiredCameraPos = new THREE.Vector3().copy(lookAtPoint).add(offsetDirection.multiplyScalar(8));
+
+            // Now, convert to CANNON.Vec3 for raycasting
+            const rayFrom = new CANNON.Vec3(lookAtPoint.x, lookAtPoint.y, lookAtPoint.z);
+            const rayTo = new CANNON.Vec3(desiredCameraPos.x, desiredCameraPos.y, desiredCameraPos.z);
+
+            const ray = new CANNON.Ray(rayFrom, rayTo);
+            ray.collisionFilterMask = ~this.character.body.collisionFilterGroup; // Ignore character's physics body
+
+            const result = new CANNON.RaycastResult();
+            if (this.physicsWorld.raycastClosest(ray.from, ray.to, {}, result)) {
+                // Collision detected. Position camera just before the hit point.
+                const hitPoint = result.hitPointWorld; // CANNON.Vec3
+                
+                // Create a direction vector from the lookAtPoint to the hitPoint
+                const direction = new CANNON.Vec3();
+                hitPoint.vsub(rayFrom, direction);
+                direction.normalize();
+
+                // Move back a little from the hit point
+                const newCamPos = hitPoint.vsub(direction.scale(0.5));
+
+                this.camera.position.copy(newCamPos); // Copy from CANNON.Vec3 to THREE.Vector3
+            } else {
+                // No collision, use the desired position
+                this.camera.position.copy(desiredCameraPos);
+            }
+
+            this.camera.lookAt(lookAtPoint);
         }
     }
 }
