@@ -10,6 +10,7 @@ export class Character {
         this.radius = CHARACTER_SETTINGS.radius;
 
         this.model = null;
+        this.flyingModel = null;
         this.mixer = null;
         this.animationActions = {};
         this.activeAction = null;
@@ -26,7 +27,7 @@ export class Character {
         this.inputEnabled = true;
         this.isFlying = false;
 
-        this.loadModel();
+        this.loadModels();
     }
 
     enableInput() {
@@ -40,10 +41,19 @@ export class Character {
     toggleFlyingMode() {
         this.isFlying = !this.isFlying;
         this.body.allowSleep = !this.isFlying;
+
+        if (this.isFlying) {
+            this.scene.remove(this.model);
+            this.scene.add(this.flyingModel);
+        } else {
+            this.scene.remove(this.flyingModel);
+            this.scene.add(this.model);
+        }
     }
 
-    loadModel() {
+    loadModels() {
         const loader = new GLTFLoader();
+        // Load walking model
         loader.load(
             CHARACTER_SETTINGS.modelPath,
             (gltf) => {
@@ -75,6 +85,25 @@ export class Character {
                 }
             }
         );
+
+        // Load flying model
+        loader.load(
+            CHARACTER_SETTINGS.flyingModelPath,
+            (gltf) => {
+                this.flyingModel = gltf.scene;
+                this.flyingModel.scale.set(CHARACTER_SETTINGS.scale, CHARACTER_SETTINGS.scale, CHARACTER_SETTINGS.scale);
+                this.flyingModel.traverse(node => {
+                    if (node.isMesh) {
+                        node.castShadow = true;
+                        const oldMaterial = node.material;
+                        node.material = new THREE.MeshToonMaterial({
+                            color: oldMaterial.color,
+                            map: oldMaterial.map,
+                        });
+                    }
+                });
+            }
+        );
     }
 
     setActiveAction(action) {
@@ -95,10 +124,21 @@ export class Character {
             return;
         }
 
+        const activeModel = this.isFlying ? this.flyingModel : this.model;
+
         if (this.isFlying) {
             this.updateFlying(delta, keys, camera);
         } else {
             this.updateWalking(delta, keys, camera);
+        }
+
+        activeModel.position.copy(this.body.position);
+        activeModel.position.y -= this.radius;
+
+        const lookDirection = new THREE.Vector3(this.body.velocity.x, 0, this.body.velocity.z);
+        if (lookDirection.length() > 0.1) {
+            const targetQuaternion = new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 0, 1), lookDirection.normalize());
+            activeModel.quaternion.slerp(targetQuaternion, 0.1);
         }
     }
 
@@ -132,15 +172,6 @@ export class Character {
 
         if (this.animationActions.run) {
             this.setActiveAction(this.animationActions.run);
-        }
-
-        this.model.position.copy(this.body.position);
-        this.model.position.y -= this.radius;
-
-        const lookDirection = new THREE.Vector3(this.body.velocity.x, 0, this.body.velocity.z);
-        if (lookDirection.length() > 0.1) {
-            const targetQuaternion = new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 0, 1), lookDirection.normalize());
-            this.model.quaternion.slerp(targetQuaternion, 0.1);
         }
     }
 
@@ -176,15 +207,6 @@ export class Character {
             this.setActiveAction(this.animationActions.walk);
         } else if (this.animationActions.idle) {
             this.setActiveAction(this.animationActions.idle);
-        }
-
-        this.model.position.copy(this.body.position);
-        this.model.position.y -= this.radius;
-
-        const lookDirection = new THREE.Vector3(this.body.velocity.x, 0, this.body.velocity.z);
-        if (lookDirection.length() > 0.1) {
-            const targetQuaternion = new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 0, 1), lookDirection.normalize());
-            this.model.quaternion.slerp(targetQuaternion, 0.1);
         }
     }
 }
