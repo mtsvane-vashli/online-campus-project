@@ -73,6 +73,11 @@ export class Character {
                             color: oldMaterial.color,
                             map: oldMaterial.map,
                         });
+                        // 法線がない場合に計算する
+                        if (!node.geometry.attributes.normal) {
+                            node.geometry.computeVertexNormals();
+                            console.log(`Computed normals for walking model mesh: ${node.name}`);
+                        }
                     }
                 });
                 this.scene.add(this.model);
