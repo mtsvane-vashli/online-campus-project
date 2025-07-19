@@ -34,7 +34,7 @@ export async function createCampusEnvironment(scene, world, mode = 'day') {
 
     } else { // 'day' mode
         scene.background = new THREE.Color(0x87CEEB); // スカイブルー
-        ambientLight = new THREE.AmbientLight(0xb0e0e6, 0.5); // 空の色に合わせて調整
+        ambientLight = new THREE.AmbientLight(0xffffff, 0.5); // 空の色に合わせて調整
         directionalLight = new THREE.DirectionalLight(0xffffff, 1.0); // 通常の明るさの指向性ライト
         directionalLight.position.set(10, 50, 20);
     }
