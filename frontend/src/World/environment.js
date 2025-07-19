@@ -16,6 +16,22 @@ export async function createCampusEnvironment(scene, world, mode = 'day') {
         ambientLight = new THREE.AmbientLight(0x404080, 0.3); // 青みがかった弱い環境光
         directionalLight = new THREE.DirectionalLight(0x8080a0, 0.2); // 青みがかった弱い指向性ライト
         directionalLight.position.set(10, 50, 20);
+
+        // 星の追加
+        const starGeometry = new THREE.BufferGeometry();
+        const starMaterial = new THREE.PointsMaterial({ color: 0xffffff, size: 0.5 });
+
+        const starVertices = [];
+        for (let i = 0; i < 1000; i++) {
+            const x = (Math.random() - 0.5) * 2000;
+            const y = (Math.random() - 0.5) * 2000;
+            const z = (Math.random() - 0.5) * 2000;
+            starVertices.push(x, y, z);
+        }
+        starGeometry.setAttribute('position', new THREE.Float32BufferAttribute(starVertices, 3));
+        const stars = new THREE.Points(starGeometry, starMaterial);
+        scene.add(stars);
+
     } else { // 'day' mode
         scene.background = new THREE.Color(0x87CEEB); // スカイブルー
         ambientLight = new THREE.AmbientLight(0xb0e0e6, 0.5); // 空の色に合わせて調整
