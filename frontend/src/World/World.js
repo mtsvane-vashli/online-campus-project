@@ -14,7 +14,7 @@ export class World {
         // Basic setup
         this.scene = new THREE.Scene();
         this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        this.renderer = new THREE.WebGLRenderer({ antialias: true });
+        this.renderer = null; // Initialized in init()
         this.clock = new THREE.Clock();
 
         // Physics
@@ -40,6 +40,7 @@ export class World {
 
     async init() {
         const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setPixelRatio(window.devicePixelRatio);
         renderer.setSize(window.innerWidth, window.innerHeight);
         renderer.setClearColor(0x87ceeb);
         renderer.shadowMap.enabled = true;
@@ -118,6 +119,7 @@ export class World {
         window.addEventListener('resize', () => {
             this.camera.aspect = window.innerWidth / window.innerHeight;
             this.camera.updateProjectionMatrix();
+            this.renderer.setPixelRatio(window.devicePixelRatio);
             this.renderer.setSize(window.innerWidth, window.innerHeight);
         });
 
