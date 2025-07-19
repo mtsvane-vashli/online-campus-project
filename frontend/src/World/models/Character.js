@@ -23,7 +23,17 @@ export class Character {
         this.body.angularDamping = 1.0;
         this.world.addBody(this.body);
 
+        this.inputEnabled = true; // 新しく追加
+
         this.loadModel();
+    }
+
+    enableInput() {
+        this.inputEnabled = true;
+    }
+
+    disableInput() {
+        this.inputEnabled = false;
     }
 
     loadModel() {
@@ -70,6 +80,16 @@ export class Character {
 
     update(delta, keys, camera) {
         if (!this.model || !this.mixer) return;
+        if (!this.inputEnabled) { // 新しく追加
+            // 入力が無効な場合はキャラクターの移動を停止
+            this.body.velocity.x = 0;
+            this.body.velocity.z = 0;
+            // アイドルアニメーションに設定
+            if (this.animationActions.idle) {
+                this.setActiveAction(this.animationActions.idle);
+            }
+            return;
+        }
 
         // Shiftキーが押されているかで速度を切り替え
         const isRunning = keys['shift'];

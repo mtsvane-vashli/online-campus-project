@@ -1,14 +1,7 @@
-[plugin:vite:import-analysis] Failed to parse source for import analysis because the content contains invalid JS syntax. If you are using JSX, make sure to name the file with the .jsx or .tsx extension.
-/home/kosuke/workspace/online-campus-project/frontend/src/UI/InteractionUI.js:91:0
-89 |      }
-90 |      }
-91 |  }
-   |  ^
-    at TransformPluginContext._formatLog (file:///home/kosuke/workspace/online-campus-project/frontend/node_modules/vite/dist/node/chunks/dep-DZ2tZksn.js:31435:43)
-    at TransformPluginContext.error (file:///home/kosuke/workspace/online-campus-project/frontend/node_modules/vite/dist/node/chunks/dep-DZ2tZksn.js:31432:14)
-    at TransformPluginContext.transform (file:///home/kosuke/workspace/online-campus-project/frontend/node_modules/vite/dist/node/chunks/dep-DZ2tZksn.js:29941:10)
-    at async EnvironmentPluginContainer.transform (file:///home/kosuke/workspace/online-campus-project/frontend/node_modules/vite/dist/node/chunks/dep-DZ2tZksn.js:31249:14)
-    at async loadAndTransform (file:///home/kosuke/workspace/online-campus-project/frontend/node_modules/vite/dist/node/chunks/dep-DZ2tZksn.js:26419:26)
-    at async viteTransformMiddleware (file:///home/kosuke/workspace/online-campus-project/frontend/node_modules/vite/dist/node/chunks/dep-DZ2tZksn.js:27504:20)
-Click outside, press Esc key, or fix the code to dismiss.
-You can also disable this overlay by setting server.hmr.overlay to false in vite.config.js.
+Failed to load resource: net::ERR_INVALID_HTTP_RESPONSE
+GLTFLoader.js:289  TypeError: Failed to fetch
+    at FileLoader.load (three.core.js:43848:3)
+    at GLTFLoader.load (GLTFLoader.js:305:10)
+    at Character.loadModel (Character.js:31:16)
+    at new Character (Character.js:26:14)
+    at World.init (World.js:52:26)

@@ -21,6 +21,17 @@ export class Chat {
             if (event.key === 'Enter') this.sendMessage();
         });
 
+        // PC: Open chat with '/' key
+        document.addEventListener('keydown', (e) => {
+            if (e.ctrlKey && e.key === '/' && window.innerWidth > 800) {
+                if (this.chatContainer.classList.contains('hidden')) {
+                    this.openChat();
+                } else {
+                    this.closeChat();
+                }
+            }
+        });
+
         // Stop propagation for touch events on the container to prevent camera movement
         this.chatContainer.addEventListener('touchstart', (e) => e.stopPropagation());
         this.chatContainer.addEventListener('touchend', (e) => e.stopPropagation());
@@ -34,11 +45,14 @@ export class Chat {
     openChat() {
         this.chatContainer.classList.remove('hidden');
         this.chatOpenBtn.classList.add('hidden');
+        this.chatInput.focus(); // Add this line to focus on the input field
+        document.dispatchEvent(new CustomEvent('chat-opened')); // イベント発火
     }
 
     closeChat() {
         this.chatContainer.classList.add('hidden');
         this.chatOpenBtn.classList.remove('hidden');
+        document.dispatchEvent(new CustomEvent('chat-closed')); // イベント発火
     }
 
     async sendMessage() {
@@ -47,6 +61,7 @@ export class Chat {
 
         this.appendMessage(messageText, 'user-message');
         this.chatInput.value = '';
+        this.closeChat(); // メッセージ送信後にチャットを閉じる
 
         try {
             const response = await fetch(this.backendUrl, {

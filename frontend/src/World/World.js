@@ -90,6 +90,19 @@ export class World {
             this.keys[e.key.toLowerCase()] = false;
         });
 
+        // Chat events to control character input
+        document.addEventListener('chat-opened', () => {
+            if (this.character) {
+                this.character.disableInput();
+            }
+        });
+
+        document.addEventListener('chat-closed', () => {
+            if (this.character) {
+                this.character.enableInput();
+            }
+        });
+
         document.body.addEventListener('click', () => { 
             if(window.innerWidth > 800) document.body.requestPointerLock(); 
         });
