@@ -12,7 +12,9 @@ export class Character {
         this.model = null;
         this.flyingModel = null;
         this.mixer = null;
+        this.flyingMixer = null;
         this.animationActions = {};
+        this.flyingAnimationAction = null;
         this.activeAction = null;
 
         this.body = new CANNON.Body({
@@ -45,9 +47,13 @@ export class Character {
         if (this.isFlying) {
             this.scene.remove(this.model);
             this.scene.add(this.flyingModel);
+            if (this.activeAction) this.activeAction.stop();
+            if (this.flyingAnimationAction) this.flyingAnimationAction.play();
         } else {
             this.scene.remove(this.flyingModel);
             this.scene.add(this.model);
+            if (this.flyingAnimationAction) this.flyingAnimationAction.stop();
+            if (this.animationActions.idle) this.setActiveAction(this.animationActions.idle);
         }
     }
 
@@ -102,6 +108,11 @@ export class Character {
                         });
                     }
                 });
+                this.flyingMixer = new THREE.AnimationMixer(this.flyingModel);
+                const flyingClip = THREE.AnimationClip.findByName(gltf.animations, 'flying');
+                if (flyingClip) {
+                    this.flyingAnimationAction = this.flyingMixer.clipAction(flyingClip);
+                }
             }
         );
     }
@@ -114,7 +125,7 @@ export class Character {
     }
 
     update(delta, keys, camera) {
-        if (!this.model || !this.mixer) return;
+        if (!this.model || !this.flyingModel) return;
         if (!this.inputEnabled) {
             this.body.velocity.x = 0;
             this.body.velocity.z = 0;
@@ -168,10 +179,8 @@ export class Character {
         this.body.velocity.z = moveDirection.z * currentSpeed;
         this.body.velocity.y = verticalVelocity;
 
-        this.mixer.update(delta);
-
-        if (this.animationActions.run) {
-            this.setActiveAction(this.animationActions.run);
+        if (this.flyingMixer) {
+            this.flyingMixer.update(delta);
         }
     }
 
@@ -198,7 +207,9 @@ export class Character {
         this.body.velocity.x = moveDirection.x * currentSpeed;
         this.body.velocity.z = moveDirection.z * currentSpeed;
 
-        this.mixer.update(delta);
+        if (this.mixer) {
+            this.mixer.update(delta);
+        }
 
         const speed = new THREE.Vector3(this.body.velocity.x, 0, this.body.velocity.z).length();
         if (speed > 5.1 && this.animationActions.run) {
