@@ -14,15 +14,21 @@ export class Chat {
     }
 
     setupEventListeners() {
-        this.chatOpenBtn.addEventListener('click', () => this.openChat());
-        this.chatCloseBtn.addEventListener('click', () => this.closeChat());
-        this.chatSendBtn.addEventListener('click', () => this.sendMessage());
+        this.chatOpenBtn.addEventListener('touchend', (e) => { e.preventDefault(); this.openChat(); });
+        this.chatCloseBtn.addEventListener('touchend', (e) => { e.preventDefault(); this.closeChat(); });
+        this.chatSendBtn.addEventListener('touchend', (e) => { e.preventDefault(); this.sendMessage(); });
         this.chatInput.addEventListener('keydown', (event) => {
             if (event.key === 'Enter') this.sendMessage();
         });
 
-        this.chatContainer.addEventListener('click', (event) => event.stopPropagation());
-        this.chatOpenBtn.addEventListener('click', (event) => event.stopPropagation());
+        // Stop propagation for touch events on the container to prevent camera movement
+        this.chatContainer.addEventListener('touchstart', (e) => e.stopPropagation());
+        this.chatContainer.addEventListener('touchend', (e) => e.stopPropagation());
+        this.chatContainer.addEventListener('touchmove', (e) => e.stopPropagation());
+
+        // Stop propagation for touch events on the open button
+        this.chatOpenBtn.addEventListener('touchstart', (e) => e.stopPropagation());
+        this.chatOpenBtn.addEventListener('touchend', (e) => e.stopPropagation());
     }
 
     openChat() {

@@ -1,4 +1,14 @@
-Uncaught TypeError: this.cameraOffset.clone(...).normalize(...).scale is not a function
-    at World.updateCamera (World.js:154:90)
-    at World.animate (World.js:123:18)
-    at World.js:109:42
+[plugin:vite:import-analysis] Failed to parse source for import analysis because the content contains invalid JS syntax. If you are using JSX, make sure to name the file with the .jsx or .tsx extension.
+/home/kosuke/workspace/online-campus-project/frontend/src/UI/InteractionUI.js:91:0
+89 |      }
+90 |      }
+91 |  }
+   |  ^
+    at TransformPluginContext._formatLog (file:///home/kosuke/workspace/online-campus-project/frontend/node_modules/vite/dist/node/chunks/dep-DZ2tZksn.js:31435:43)
+    at TransformPluginContext.error (file:///home/kosuke/workspace/online-campus-project/frontend/node_modules/vite/dist/node/chunks/dep-DZ2tZksn.js:31432:14)
+    at TransformPluginContext.transform (file:///home/kosuke/workspace/online-campus-project/frontend/node_modules/vite/dist/node/chunks/dep-DZ2tZksn.js:29941:10)
+    at async EnvironmentPluginContainer.transform (file:///home/kosuke/workspace/online-campus-project/frontend/node_modules/vite/dist/node/chunks/dep-DZ2tZksn.js:31249:14)
+    at async loadAndTransform (file:///home/kosuke/workspace/online-campus-project/frontend/node_modules/vite/dist/node/chunks/dep-DZ2tZksn.js:26419:26)
+    at async viteTransformMiddleware (file:///home/kosuke/workspace/online-campus-project/frontend/node_modules/vite/dist/node/chunks/dep-DZ2tZksn.js:27504:20)
+Click outside, press Esc key, or fix the code to dismiss.
+You can also disable this overlay by setting server.hmr.overlay to false in vite.config.js.

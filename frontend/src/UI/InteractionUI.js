@@ -1,34 +1,40 @@
 // src/UI/InteractionUI.js
 export class InteractionUI {
     // 複数のinfoBoxesを配列で受け取るように変更
-    constructor(character, infoBoxes) {
+    constructor(character, infoBoxes, keys) {
         this.character = character;
         this.infoBoxes = infoBoxes;
+        this.keys = keys;
         
         this.interactionPrompt = document.getElementById('interaction-prompt');
         this.infoPanel = document.getElementById('info-panel');
         this.infoPanelTitle = document.querySelector('#info-panel-content h2');
         this.infoPanelText = document.querySelector('#info-panel-content p');
 
-
-        this.activeInfoBox = null; // 現在操作可能な最も近い情報ボックス
-        this.openedInfoBox = null; // 現在開いている情報ボックス
+        this.activeInfoBox = null;
+        this.openedInfoBox = null;
         this.interactionDistance = 5;
+        this.eKeyPressedLastFrame = false; // Add this line
 
         this.setupEventListeners();
     }
 
     setupEventListeners() {
-
         document.addEventListener('keydown', (e) => {
             const key = e.key.toLowerCase();
-            // Eキーでパネルの表示・非表示
-            if (key === 'e' && this.activeInfoBox) {
+            if (key === 'e' && this.activeInfoBox && !this.eKeyPressedLastFrame) {
                 this.togglePanel();
             }
-            // Escキーでパネルを閉じる
             if (key === 'escape' && this.infoPanel.style.display === 'block') {
                 this.closePanel();
+            }
+            this.eKeyPressedLastFrame = (key === 'e');
+        });
+
+        document.addEventListener('keyup', (e) => {
+            const key = e.key.toLowerCase();
+            if (key === 'e') {
+                this.eKeyPressedLastFrame = false;
             }
         });
     }
@@ -55,6 +61,12 @@ export class InteractionUI {
     closePanel() {
         this.infoPanel.style.display = 'none';
         this.openedInfoBox = null;
+    }
+
+    handleActionButtonClick() {
+        if (this.activeInfoBox) {
+            this.togglePanel();
+        }
     }
 
     update() {

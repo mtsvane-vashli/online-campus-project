@@ -6,7 +6,7 @@
     <title>オンラインキャンパス体験 - プロトタイプ</title>
     <link rel="icon" href="data:,">
     <style>
-        body { margin: 0; }
+        body { margin: 0; overscroll-behavior: none; }
         canvas { display: block; }
         #instructions {
             position: absolute;
@@ -17,6 +17,28 @@
             padding: 10px;
             border-radius: 5px;
             font-family: sans-serif;
+            z-index: 10;
+        }
+
+        @media (max-width: 800px) {
+            #instructions {
+                display: none;
+            }
+
+            #chat-container {
+                width: 90%;
+                height: 40vh; /* Adjust height for landscape */
+                top: auto; /* Reset top */
+                left: auto; /* Reset left */
+                transform: none; /* Reset transform */
+                bottom: 20px; /* Keep original bottom position */
+                right: 20px; /* Keep original right position */
+            }
+
+            #chat-open-btn {
+                bottom: 100px; /* Adjust position to avoid joystick/action button */
+                right: 20px;
+            }
         }
     </style>
 </head>
@@ -38,7 +60,6 @@
             </div>
     </div>
     <style>
-        body { margin: 0; }
         canvas { display: block; }
         #instructions {
             position: absolute;
@@ -105,7 +126,7 @@
             bottom: 20px;
             right: 20px;
             width: 350px;
-            height: 500px;
+            height: 200px;
             background-color: white;
             border-radius: 15px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.2);
@@ -184,6 +205,60 @@
         #chat-send-btn:hover {
             background-color: #0056b3;
         }
+
+        /* Default hide for PC */
+        #joystick-container,
+        #action-button-container {
+            display: none;
+        }
+
+        @media (max-width: 800px) {
+            #joystick-container {
+                display: block;
+                position: fixed;
+                bottom: 30px;
+                left: 30px;
+                width: 120px;
+                height: 120px;
+                z-index: 100;
+            }
+
+            #joystick-base {
+                position: absolute;
+                width: 100%;
+                height: 100%;
+                background-color: rgba(128, 128, 128, 0.5);
+                border-radius: 50%;
+            }
+
+            #joystick-stick {
+                position: absolute;
+                top: 30px;
+                left: 30px;
+                width: 60px;
+                height: 60px;
+                background-color: rgba(128, 128, 128, 0.8);
+                border-radius: 50%;
+            }
+
+            #action-button-container {
+                display: block;
+                position: fixed;
+                bottom: 40px;
+                right: 40px;
+                z-index: 100;
+            }
+
+            #action-button {
+                width: 80px;
+                height: 80px;
+                font-size: 24px;
+                border-radius: 50%;
+                background-color: rgba(255, 82, 82, 0.8);
+                border: none;
+                color: white;
+            }
+        }
     </style>
 
     <div id="chat-container" class="hidden">
@@ -205,6 +280,14 @@
     </button>
 
     
+    <div id="joystick-container">
+        <div id="joystick-base">
+            <div id="joystick-stick"></div>
+        </div>
+    </div>
+    <div id="action-button-container">
+        <button id="action-button">A</button>
+    </div>
     <script type="module" src="/src/main.js"></script>
 </body>
 </html>

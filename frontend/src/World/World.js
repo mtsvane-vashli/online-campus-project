@@ -25,6 +25,9 @@ export class World {
         this.keys = {};
         this.cameraOffset = new THREE.Vector3(0, 2, 8);
 
+        // Touch controls
+        this.touchState = { joystick: { active: false, startX: 0, startY: 0, currentX: 0, currentY: 0 }, camera: { active: false, startX: 0, startY: 0, currentX: 0, currentY: 0, touchId: null } };
+
         // Components
         this.character = null;
         this.infoBox = null;
@@ -64,7 +67,7 @@ export class World {
         ];
         
         this.chat = new Chat();
-        this.interactionUI = new InteractionUI(this.character, this.infoBoxes);
+        this.interactionUI = new InteractionUI(this.character, this.infoBoxes, this.keys);
         
         //this.debugger = CannonDebugger(this.scene, this.physicsWorld);
 
@@ -77,7 +80,6 @@ export class World {
             const key = e.key.toLowerCase();
             this.keys[key] = true;
 
-            // 'P'キーでキャラクターの現在位置をコンソールに出力する
             if (key === 'p') {
                 const pos = this.character.body.position;
                 console.log(`Character Position: { x: ${pos.x.toFixed(2)}, y: ${pos.y.toFixed(2)}, z: ${pos.z.toFixed(2)} }`);
@@ -87,9 +89,11 @@ export class World {
         document.addEventListener('keyup', (e) => {
             this.keys[e.key.toLowerCase()] = false;
         });
-        
-        document.body.addEventListener('click', () => { document.body.requestPointerLock(); });
-        
+
+        document.body.addEventListener('click', () => { 
+            if(window.innerWidth > 800) document.body.requestPointerLock(); 
+        });
+
         document.addEventListener('mousemove', (e) => {
             if (document.pointerLockElement === document.body) {
                 this.cameraOffset.applyAxisAngle(new THREE.Vector3(0, 1, 0), -e.movementX * 0.002);
@@ -103,6 +107,109 @@ export class World {
             this.camera.updateProjectionMatrix();
             this.renderer.setSize(window.innerWidth, window.innerHeight);
         });
+
+        // Touch Events
+        const joystickBase = document.getElementById('joystick-base');
+        const joystickStick = document.getElementById('joystick-stick');
+        const actionButton = document.getElementById('action-button');
+
+        joystickBase.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            this.touchState.joystick.active = true;
+            const touch = e.changedTouches[0];
+            this.touchState.joystick.startX = touch.clientX;
+            this.touchState.joystick.startY = touch.clientY;
+        }, { passive: false });
+
+        joystickBase.addEventListener('touchmove', (e) => {
+            e.preventDefault();
+            if (!this.touchState.joystick.active) return;
+            const touch = e.changedTouches[0];
+            this.touchState.joystick.currentX = touch.clientX;
+            this.touchState.joystick.currentY = touch.clientY;
+
+            const deltaX = this.touchState.joystick.currentX - this.touchState.joystick.startX;
+            const deltaY = this.touchState.joystick.currentY - this.touchState.joystick.startY;
+            const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+            const maxDistance = 60;
+            const angle = Math.atan2(deltaY, deltaX);
+
+            const stickX = Math.min(maxDistance, distance) * Math.cos(angle);
+            const stickY = Math.min(maxDistance, distance) * Math.sin(angle);
+
+            joystickStick.style.transform = `translate(${stickX}px, ${stickY}px)`;
+
+            this.updateKeysFromJoystick(deltaX, deltaY);
+        }, { passive: false });
+
+        joystickBase.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            this.touchState.joystick.active = false;
+            joystickStick.style.transform = 'translate(0, 0)';
+            this.resetKeys();
+        }, { passive: false });
+
+        actionButton.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            if (this.interactionUI) {
+                this.interactionUI.handleActionButtonClick();
+            }
+        });
+
+        // Camera touch controls
+        this.renderer.domElement.addEventListener('touchstart', (e) => {
+            // Check if the touch originated on a UI element
+            const targetId = e.target.id;
+            if (targetId.includes('joystick') || targetId.includes('action-button') || targetId.includes('chat')) {
+                // Allow default behavior for UI elements to enable their clicks/taps
+                return;
+            }
+
+            // If there's already a camera touch, ignore new ones
+            if (this.touchState.camera.active) return;
+
+            e.preventDefault(); // Only prevent default if it's a camera touch
+
+            const touch = e.changedTouches[0];
+            this.touchState.camera.active = true;
+            this.touchState.camera.touchId = touch.identifier;
+            this.touchState.camera.startX = touch.clientX;
+            this.touchState.camera.startY = touch.clientY;
+        }, { passive: false });
+
+        this.renderer.domElement.addEventListener('touchmove', (e) => {
+            if (!this.touchState.camera.active) return;
+
+            // Find the correct touch
+            let touch = null;
+            for (let i = 0; i < e.changedTouches.length; i++) {
+                if (e.changedTouches[i].identifier === this.touchState.camera.touchId) {
+                    touch = e.changedTouches[i];
+                    break;
+                }
+            }
+            if (!touch) return; // Touch not found
+
+            const deltaX = touch.clientX - this.touchState.camera.startX;
+            const deltaY = touch.clientY - this.touchState.camera.startY;
+
+            this.cameraOffset.applyAxisAngle(new THREE.Vector3(0, 1, 0), -deltaX * 0.005);
+            const newY = this.cameraOffset.y + deltaY * 0.005;
+            if (newY > 1 && newY < 5) this.cameraOffset.y = newY;
+
+            this.touchState.camera.startX = touch.clientX;
+            this.touchState.camera.startY = touch.clientY;
+        }, { passive: false });
+
+        this.renderer.domElement.addEventListener('touchend', (e) => {
+            for (let i = 0; i < e.changedTouches.length; i++) {
+                if (e.changedTouches[i].identifier === this.touchState.camera.touchId) {
+                    this.touchState.camera.active = false;
+                    this.touchState.camera.touchId = null;
+                    break;
+                }
+            }
+        }, { passive: false });
     }
 
     animate() {
@@ -183,5 +290,26 @@ export class World {
 
             this.camera.lookAt(lookAtPoint);
         }
+    }
+
+    updateKeysFromJoystick(deltaX, deltaY) {
+        const moveThreshold = 20;
+        const runThreshold = 50; // ジョイスティックを大きく倒したと判断する閾値
+
+        this.keys['w'] = deltaY < -moveThreshold;
+        this.keys['s'] = deltaY > moveThreshold;
+        this.keys['a'] = deltaX < -moveThreshold;
+        this.keys['d'] = deltaX > moveThreshold;
+
+        const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+        this.keys['shift'] = distance > runThreshold;
+    }
+
+    resetKeys() {
+        this.keys['w'] = false;
+        this.keys['s'] = false;
+        this.keys['a'] = false;
+        this.keys['d'] = false;
+        this.keys['shift'] = false; // shiftキーもリセット
     }
 }
