@@ -20,6 +20,7 @@
 - **フロントエンド**:
     - **3D描画**: Three.js
     - **物理演算**: cannon-es
+    - **ビルドツール**: Vite
     - **言語**: JavaScript (ESM)
 - **バックエンド**:
     - **サーバー**: Node.js, Express.js
@@ -39,13 +40,17 @@
 
 ### 2. セットアップ
 
-プロジェクト全体をクローンした後、バックエンドの依存関係をインストールします。
+プロジェクト全体をクローンした後、フロントエンドとバックエンドの依存関係をインストールします。
 
 ```bash
 # プロジェクトのルートディレクトリで実行
 
+# フロントエンドのセットアップ
+cd frontend
+npm install
+
 # バックエンドのセットアップ
-cd backend
+cd ../backend
 npm install
 ```
 
@@ -74,11 +79,14 @@ node server.js
 
 #### **ステップ2: フロントエンドの起動**
 
-別のターミナルを開き、`frontend`ディレクトリでローカルサーバーを起動します。VS Codeの拡張機能である**Live Server**を使用するのが最も簡単です。
+別のターミナルを開き、`frontend`ディレクトリで開発サーバーを起動します。
 
-1.  VS Codeで`frontend`フォルダを開きます。（あるいはプロジェクトのルートを開きます）
-2.  `frontend/public/index.html`ファイルを右クリックし、「Open with Live Server」を選択します。
-3.  ブラウザが自動で開き、アプリケーションが表示されます。
+```bash
+# frontendディレクトリで実行
+npm run dev
+```
+
+表示されたURL（通常は `http://localhost:5173`）にブラウザでアクセスします。
 
 ---
 
@@ -97,6 +105,8 @@ node server.js
 └─frontend/
    ├─src/
    │  │  main.js             # アプリケーションのエントリーポイント
+   │  │  config.js           # 設定ファイル
+   │  │  InputManager.js     # 入力処理を管理
    │  ├─World/
    │  │  │  World.js          # 3D世界の骨格を管理
    │  │  │  environment.js    # 地面やライティングを作成

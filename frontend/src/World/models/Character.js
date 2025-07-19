@@ -1,13 +1,13 @@
-// src/World/models/Character.js
 import * as THREE from 'three';
 import * as CANNON from 'cannon-es';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+import { CHARACTER_SETTINGS } from '../../config.js';
 
 export class Character {
     constructor(scene, world) {
         this.scene = scene;
         this.world = world;
-        this.radius = 0.5;
+        this.radius = CHARACTER_SETTINGS.radius;
 
         this.model = null;
         this.mixer = null;
@@ -39,10 +39,10 @@ export class Character {
     loadModel() {
         const loader = new GLTFLoader();
         loader.load(
-            '/fox.glb',
+            CHARACTER_SETTINGS.modelPath,
             (gltf) => {
                 this.model = gltf.scene;
-                this.model.scale.set(0.02, 0.02, 0.02);
+                this.model.scale.set(CHARACTER_SETTINGS.scale, CHARACTER_SETTINGS.scale, CHARACTER_SETTINGS.scale);
                 this.model.traverse(node => {
                     if (node.isMesh) {
                         node.castShadow = true;
@@ -93,7 +93,7 @@ export class Character {
 
         // Shiftキーが押されているかで速度を切り替え
         const isRunning = keys['shift'];
-        const currentSpeed = isRunning ? 10 : 5; // 走る速度:10, 歩く速度:5
+        const currentSpeed = isRunning ? CHARACTER_SETTINGS.speed.run : CHARACTER_SETTINGS.speed.walk; // 走る速度:10, 歩く速度:5
         
         const moveDirection = new THREE.Vector3();
         const euler = new THREE.Euler(0, 0, 0, 'YXZ');
