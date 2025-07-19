@@ -61,7 +61,6 @@ export class Chat {
 
         this.appendMessage(messageText, 'user-message');
         this.chatInput.value = '';
-        this.closeChat(); // メッセージ送信後にチャットを閉じる
 
         try {
             const response = await fetch(this.backendUrl, {
