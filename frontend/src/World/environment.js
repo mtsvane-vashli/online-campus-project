@@ -7,7 +7,10 @@ import { threeToCannon } from './utils/three-to-cannon.js'; // 物理メッシ�
 // 非同期関数として定義
 export async function createCampusEnvironment(scene, world) {
     // Lighting (ライティング設定はそのまま)
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.5); // 少し暗くする
+    // 空の色を設定
+    scene.background = new THREE.Color(0x87CEEB); // スカイブルー
+
+    const ambientLight = new THREE.AmbientLight(0xb0e0e6, 0.5); // 空の色に合わせて調整
     scene.add(ambientLight);
     const directionalLight = new THREE.DirectionalLight(0xffffff, 1.0); // 少し暗くする
     directionalLight.position.set(10, 50, 20); // ライトの位置を調整
