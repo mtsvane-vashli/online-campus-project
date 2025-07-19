@@ -5,14 +5,25 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { threeToCannon } from './utils/three-to-cannon.js'; // 物理メッシュ変換用のヘルパー
 
 // 非同期関数として定義
-export async function createCampusEnvironment(scene, world) {
+export async function createCampusEnvironment(scene, world, mode = 'day') {
     // Lighting (ライティング設定はそのまま)
-    // 空の色を設定
-    scene.background = new THREE.Color(0x87CEEB); // スカイブルー
+    // Lighting (ライティング設定はそのまま)
+    let ambientLight;
+    let directionalLight;
 
-    const ambientLight = new THREE.AmbientLight(0xb0e0e6, 0.5); // 空の色に合わせて調整
+    if (mode === 'night') {
+        scene.background = new THREE.Color(0x0a0a20); // 非常に暗い青
+        ambientLight = new THREE.AmbientLight(0x404080, 0.3); // 青みがかった弱い環境光
+        directionalLight = new THREE.DirectionalLight(0x8080a0, 0.2); // 青みがかった弱い指向性ライト
+        directionalLight.position.set(10, 50, 20);
+    } else { // 'day' mode
+        scene.background = new THREE.Color(0x87CEEB); // スカイブルー
+        ambientLight = new THREE.AmbientLight(0xb0e0e6, 0.5); // 空の色に合わせて調整
+        directionalLight = new THREE.DirectionalLight(0xffffff, 1.0); // 通常の明るさの指向性ライト
+        directionalLight.position.set(10, 50, 20);
+    }
+
     scene.add(ambientLight);
-    const directionalLight = new THREE.DirectionalLight(0xffffff, 1.0); // 少し暗くする
     directionalLight.position.set(10, 50, 20); // ライトの位置を調整
     directionalLight.castShadow = true;
     directionalLight.shadow.mapSize.width = 4096; // 影の解像度を上げる

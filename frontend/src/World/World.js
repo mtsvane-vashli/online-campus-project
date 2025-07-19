@@ -42,7 +42,7 @@ export class World {
         this.inputManager = null;
     }
 
-    async init() {
+    async init(mode = 'day') {
         const renderer = new THREE.WebGLRenderer({ antialias: true });
         renderer.setPixelRatio(window.devicePixelRatio);
         renderer.setSize(window.innerWidth, window.innerHeight);
@@ -53,7 +53,7 @@ export class World {
 
         this.effect = new OutlineEffect(this.renderer);
 
-        this.directionalLight = await createCampusEnvironment(this.scene, this.physicsWorld);
+        this.directionalLight = await createCampusEnvironment(this.scene, this.physicsWorld, mode);
         this.character = new Character(this.scene, this.physicsWorld);
 
         // --- 情報ポイントの作成 ---
