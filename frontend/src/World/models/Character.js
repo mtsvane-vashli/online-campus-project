@@ -23,7 +23,8 @@ export class Character {
         this.body.angularDamping = 1.0;
         this.world.addBody(this.body);
 
-        this.inputEnabled = true; // 新しく追加
+        this.inputEnabled = true;
+        this.isFlying = false;
 
         this.loadModel();
     }
@@ -34,6 +35,11 @@ export class Character {
 
     disableInput() {
         this.inputEnabled = false;
+    }
+
+    toggleFlyingMode() {
+        this.isFlying = !this.isFlying;
+        this.body.allowSleep = !this.isFlying;
     }
 
     loadModel() {
@@ -80,20 +86,67 @@ export class Character {
 
     update(delta, keys, camera) {
         if (!this.model || !this.mixer) return;
-        if (!this.inputEnabled) { // 新しく追加
-            // 入力が無効な場合はキャラクターの移動を停止
+        if (!this.inputEnabled) {
             this.body.velocity.x = 0;
             this.body.velocity.z = 0;
-            // アイドルアニメーションに設定
             if (this.animationActions.idle) {
                 this.setActiveAction(this.animationActions.idle);
             }
             return;
         }
 
-        // Shiftキーが押されているかで速度を切り替え
+        if (this.isFlying) {
+            this.updateFlying(delta, keys, camera);
+        } else {
+            this.updateWalking(delta, keys, camera);
+        }
+    }
+
+    updateFlying(delta, keys, camera) {
+        const currentSpeed = CHARACTER_SETTINGS.speed.run;
+        const moveDirection = new THREE.Vector3();
+        const euler = new THREE.Euler(0, 0, 0, 'YXZ');
+
+        euler.setFromQuaternion(camera.quaternion);
+        euler.x = 0;
+        euler.z = 0;
+
+        if (keys['w']) moveDirection.z = -1;
+        if (keys['s']) moveDirection.z = 1;
+        if (keys['a']) moveDirection.x = -1;
+        if (keys['d']) moveDirection.x = 1;
+
+        let verticalVelocity = 0;
+        if (keys['e']) verticalVelocity = currentSpeed;
+        if (keys['q']) verticalVelocity = -currentSpeed;
+
+        if (moveDirection.length() > 0) {
+            moveDirection.normalize().applyEuler(euler);
+        }
+
+        this.body.velocity.x = moveDirection.x * currentSpeed;
+        this.body.velocity.z = moveDirection.z * currentSpeed;
+        this.body.velocity.y = verticalVelocity;
+
+        this.mixer.update(delta);
+
+        if (this.animationActions.run) {
+            this.setActiveAction(this.animationActions.run);
+        }
+
+        this.model.position.copy(this.body.position);
+        this.model.position.y -= this.radius;
+
+        const lookDirection = new THREE.Vector3(this.body.velocity.x, 0, this.body.velocity.z);
+        if (lookDirection.length() > 0.1) {
+            const targetQuaternion = new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 0, 1), lookDirection.normalize());
+            this.model.quaternion.slerp(targetQuaternion, 0.1);
+        }
+    }
+
+    updateWalking(delta, keys, camera) {
         const isRunning = keys['shift'];
-        const currentSpeed = isRunning ? CHARACTER_SETTINGS.speed.run : CHARACTER_SETTINGS.speed.walk; // 走る速度:10, 歩く速度:5
+        const currentSpeed = isRunning ? CHARACTER_SETTINGS.speed.run : CHARACTER_SETTINGS.speed.walk;
         
         const moveDirection = new THREE.Vector3();
         const euler = new THREE.Euler(0, 0, 0, 'YXZ');
@@ -116,9 +169,8 @@ export class Character {
 
         this.mixer.update(delta);
 
-        // 速度に応じてアニメーションを決定
         const speed = new THREE.Vector3(this.body.velocity.x, 0, this.body.velocity.z).length();
-        if (speed > 5.1 && this.animationActions.run) { // 走る速度の閾値
+        if (speed > 5.1 && this.animationActions.run) {
             this.setActiveAction(this.animationActions.run);
         } else if (speed > 0.1 && this.animationActions.walk) {
             this.setActiveAction(this.animationActions.walk);

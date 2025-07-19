@@ -79,6 +79,10 @@ export class World {
         const delta = this.clock.getDelta();
         this.physicsWorld.step(PHYSICS_SETTINGS.worldStep, delta, 3);
         
+        if (this.keys['v']) {
+            this.character.toggleFlyingMode();
+            this.keys['v'] = false;
+        }
         
         //if (this.debugger) {
         //    this.debugger.update();
