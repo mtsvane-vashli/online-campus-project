@@ -168,8 +168,8 @@ export class Character {
         if (keys['d']) moveDirection.x = 1;
 
         let verticalVelocity = 0;
-        if (keys['e']) verticalVelocity = currentSpeed;
-        if (keys['q']) verticalVelocity = -currentSpeed;
+        if (keys[' ']) verticalVelocity = currentSpeed;
+        if (keys['c']) verticalVelocity = -currentSpeed;
 
         if (moveDirection.length() > 0) {
             moveDirection.normalize().applyEuler(euler);
