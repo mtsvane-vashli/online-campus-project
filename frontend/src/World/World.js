@@ -26,6 +26,8 @@ export class World {
 
         // Controls
         this.keys = {};
+        this.cameraYaw = 0; // Initial yaw
+        this.cameraPitch = 0; // Initial pitch
         this.cameraOffset = new THREE.Vector3(CAMERA_SETTINGS.offset.x, CAMERA_SETTINGS.offset.y, CAMERA_SETTINGS.offset.z);
 
         // Touch controls
@@ -115,17 +117,27 @@ export class World {
             this.directionalLight.target.updateMatrixWorld(); // ターゲットのワールド座標を更新
         }
     }
+
+    handleCameraRotation(deltaX, deltaY) {
+        const sensitivity = 0.002; // Adjust as needed
+        this.cameraYaw -= deltaX * sensitivity;
+        this.cameraPitch -= deltaY * sensitivity;
+
+        // Clamp pitch to prevent camera from flipping upside down
+        this.cameraPitch = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, this.cameraPitch));
+    }
     
     updateCamera() {
         if (this.character && this.character.body) {
             const characterPos = this.character.body.position; // this is a CANNON.Vec3
             const lookAtPoint = new THREE.Vector3(characterPos.x, characterPos.y + CAMERA_SETTINGS.lookAtOffset.y, characterPos.z);
 
-            // Create a normalized THREE.Vector3 from the camera offset
-            const offsetDirection = this.cameraOffset.clone().normalize();
+            // Apply camera rotation based on yaw and pitch
+            this.camera.quaternion.setFromEuler(new THREE.Euler(this.cameraPitch, this.cameraYaw, 0, 'YXZ'));
 
-            // Calculate the desired camera position (as a THREE.Vector3)
-            const desiredCameraPos = new THREE.Vector3().copy(lookAtPoint).add(offsetDirection.multiplyScalar(CAMERA_SETTINGS.raycastDistance));
+            // Calculate desired camera position based on rotated offset
+            const rotatedOffset = this.cameraOffset.clone().applyQuaternion(this.camera.quaternion);
+            const desiredCameraPos = new THREE.Vector3().copy(lookAtPoint).add(rotatedOffset);
 
             // Now, convert to CANNON.Vec3 for raycasting
             const rayFrom = new CANNON.Vec3(lookAtPoint.x, lookAtPoint.y, lookAtPoint.z);
@@ -152,8 +164,6 @@ export class World {
                 // No collision, use the desired position
                 this.camera.position.copy(desiredCameraPos);
             }
-
-            this.camera.lookAt(lookAtPoint);
         }
     }
 

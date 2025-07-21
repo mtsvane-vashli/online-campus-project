@@ -74,11 +74,7 @@ export class InputManager {
 
     onMouseMove(e) {
         if (document.pointerLockElement === document.body) {
-            this.cameraOffset.applyAxisAngle(new THREE.Vector3(0, 1, 0), -e.movementX * 0.002);
-            const newY = this.cameraOffset.y + e.movementY * 0.002;
-            if (newY > 1 && newY < 5) {
-                this.cameraOffset.y = newY;
-            }
+            this.world.handleCameraRotation(e.movementX, e.movementY);
         }
     }
 
@@ -166,11 +162,7 @@ export class InputManager {
         const deltaX = touch.clientX - this.touchState.camera.startX;
         const deltaY = touch.clientY - this.touchState.camera.startY;
 
-        this.cameraOffset.applyAxisAngle(new THREE.Vector3(0, 1, 0), -deltaX * 0.005);
-        const newY = this.cameraOffset.y + deltaY * 0.005;
-        if (newY > 1 && newY < 5) {
-            this.cameraOffset.y = newY;
-        }
+        this.world.handleCameraRotation(deltaX, deltaY);
 
         this.touchState.camera.startX = touch.clientX;
         this.touchState.camera.startY = touch.clientY;
