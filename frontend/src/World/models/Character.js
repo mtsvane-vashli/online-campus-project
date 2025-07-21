@@ -76,7 +76,6 @@ export class Character {
                         // 法線がない場合に計算する
                         if (!node.geometry.attributes.normal) {
                             node.geometry.computeVertexNormals();
-                            console.log(`Computed normals for walking model mesh: ${node.name}`);
                         }
                     }
                 });

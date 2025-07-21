@@ -120,6 +120,12 @@ export class World {
 
     handleCameraRotation(deltaX, deltaY) {
         const sensitivity = 0.002; // Adjust as needed
+        const maxDelta = 50; // Maximum allowed delta value to prevent sudden jumps
+
+        // Clamp deltaX and deltaY to prevent extreme values
+        deltaX = Math.max(-maxDelta, Math.min(maxDelta, deltaX));
+        deltaY = Math.max(-maxDelta, Math.min(maxDelta, deltaY));
+
         this.cameraYaw -= deltaX * sensitivity;
         this.cameraPitch -= deltaY * sensitivity;
 
