@@ -19,7 +19,7 @@ export class Character {
 
         this.body = new CANNON.Body({
             mass: 5,
-            position: new CANNON.Vec3(-10, 100, -20),
+            position: new CANNON.Vec3(0, 0, 0),
             shape: new CANNON.Sphere(this.radius),
             material: new CANNON.Material(),
         });

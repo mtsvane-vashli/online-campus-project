@@ -9,8 +9,8 @@ export const CAMERA_SETTINGS = {
 export const CHARACTER_SETTINGS = {
     modelPath: '/fox.glb',
     flyingModelPath: '/dragon.glb',
-    scale: 0.02,
-    radius: 0.5,
+    scale: 0.01,
+    radius: 0.2,
     speed: {
         walk: 5,
         run: 10,
