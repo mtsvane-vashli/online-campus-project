@@ -68,7 +68,7 @@ export class World {
         this.interactionUI = new InteractionUI(this.character, this.infoBoxes, this.keys);
         this.inputManager = new InputManager(this);
 
-        this.debugger = CannonDebugger(this.scene, this.physicsWorld);
+        //this.debugger = CannonDebugger(this.scene, this.physicsWorld);
 
         this.animate();
     }
