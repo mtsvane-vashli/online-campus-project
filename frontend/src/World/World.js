@@ -57,6 +57,7 @@ export class World {
 
         this.directionalLight = await createCampusEnvironment(this.scene, this.physicsWorld, mode);
         this.character = new Character(this.scene, this.physicsWorld);
+        await this.character.init();
 
         // --- 情報ポイントの作成 ---
         this.infoBoxes = INFO_BOXES.map(info => new InfoBox(this.scene, this.physicsWorld, {

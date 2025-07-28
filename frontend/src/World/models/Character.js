@@ -29,7 +29,11 @@ export class Character {
         this.inputEnabled = true;
         this.isFlying = false;
 
-        this.loadModels();
+        // this.loadModels();
+    }
+
+    async init() {
+        await this.loadModels();
     }
 
     enableInput() {
@@ -58,67 +62,84 @@ export class Character {
     }
 
     loadModels() {
-        const loader = new GLTFLoader();
-        // Load walking model
-        loader.load(
-            CHARACTER_SETTINGS.modelPath,
-            (gltf) => {
-                this.model = gltf.scene;
-                this.model.scale.set(CHARACTER_SETTINGS.scale, CHARACTER_SETTINGS.scale, CHARACTER_SETTINGS.scale);
-                this.model.traverse(node => {
-                    if (node.isMesh) {
-                        node.castShadow = true;
-                        const oldMaterial = node.material;
-                        node.material = new THREE.MeshToonMaterial({
-                            color: oldMaterial.color,
-                            map: oldMaterial.map,
-                        });
-                        // 法線がない場合に計算する
-                        if (!node.geometry.attributes.normal) {
-                            node.geometry.computeVertexNormals();
+        return new Promise((resolve, reject) => {
+            const loader = new GLTFLoader();
+            let modelsLoaded = 0;
+
+            const onModelLoad = () => {
+                modelsLoaded++;
+                if (modelsLoaded === 2) {
+                    resolve();
+                }
+            };
+
+            // Load walking model
+            loader.load(
+                CHARACTER_SETTINGS.modelPath,
+                (gltf) => {
+                    this.model = gltf.scene;
+                    this.model.scale.set(CHARACTER_SETTINGS.scale, CHARACTER_SETTINGS.scale, CHARACTER_SETTINGS.scale);
+                    this.model.traverse(node => {
+                        if (node.isMesh) {
+                            node.castShadow = true;
+                            const oldMaterial = node.material;
+                            node.material = new THREE.MeshToonMaterial({
+                                color: oldMaterial.color,
+                                map: oldMaterial.map,
+                            });
+                            // 法線がない場合に計算する
+                            if (!node.geometry.attributes.normal) {
+                                node.geometry.computeVertexNormals();
+                            }
                         }
+                    });
+                    this.scene.add(this.model);
+
+                    this.mixer = new THREE.AnimationMixer(this.model);
+                    const surveyClip = THREE.AnimationClip.findByName(gltf.animations, 'Survey');
+                    const walkClip = THREE.AnimationClip.findByName(gltf.animations, 'Walk');
+                    const runClip = THREE.AnimationClip.findByName(gltf.animations, 'Run');
+
+                    if (surveyClip) this.animationActions.idle = this.mixer.clipAction(surveyClip);
+                    if (walkClip) this.animationActions.walk = this.mixer.clipAction(walkClip);
+                    if (runClip) this.animationActions.run = this.mixer.clipAction(runClip);
+
+                    if (this.animationActions.idle) {
+                        this.setActiveAction(this.animationActions.idle);
                     }
-                });
-                this.scene.add(this.model);
+                    onModelLoad();
+                },
+                undefined,
+                reject
+            );
 
-                this.mixer = new THREE.AnimationMixer(this.model);
-                const surveyClip = THREE.AnimationClip.findByName(gltf.animations, 'Survey');
-                const walkClip = THREE.AnimationClip.findByName(gltf.animations, 'Walk');
-                const runClip = THREE.AnimationClip.findByName(gltf.animations, 'Run');
-
-                if (surveyClip) this.animationActions.idle = this.mixer.clipAction(surveyClip);
-                if (walkClip) this.animationActions.walk = this.mixer.clipAction(walkClip);
-                if (runClip) this.animationActions.run = this.mixer.clipAction(runClip);
-
-                if (this.animationActions.idle) {
-                    this.setActiveAction(this.animationActions.idle);
-                }
-            }
-        );
-
-        // Load flying model
-        loader.load(
-            CHARACTER_SETTINGS.flyingModelPath,
-            (gltf) => {
-                this.flyingModel = gltf.scene;
-                this.flyingModel.scale.set(CHARACTER_SETTINGS.scale, CHARACTER_SETTINGS.scale, CHARACTER_SETTINGS.scale);
-                this.flyingModel.traverse(node => {
-                    if (node.isMesh) {
-                        node.castShadow = true;
-                        const oldMaterial = node.material;
-                        node.material = new THREE.MeshToonMaterial({
-                            color: oldMaterial.color,
-                            map: oldMaterial.map,
-                        });
+            // Load flying model
+            loader.load(
+                CHARACTER_SETTINGS.flyingModelPath,
+                (gltf) => {
+                    this.flyingModel = gltf.scene;
+                    this.flyingModel.scale.set(CHARACTER_SETTINGS.scale, CHARACTER_SETTINGS.scale, CHARACTER_SETTINGS.scale);
+                    this.flyingModel.traverse(node => {
+                        if (node.isMesh) {
+                            node.castShadow = true;
+                            const oldMaterial = node.material;
+                            node.material = new THREE.MeshToonMaterial({
+                                color: oldMaterial.color,
+                                map: oldMaterial.map,
+                            });
+                        }
+                    });
+                    this.flyingMixer = new THREE.AnimationMixer(this.flyingModel);
+                    const flyingClip = THREE.AnimationClip.findByName(gltf.animations, 'flying');
+                    if (flyingClip) {
+                        this.flyingAnimationAction = this.flyingMixer.clipAction(flyingClip);
                     }
-                });
-                this.flyingMixer = new THREE.AnimationMixer(this.flyingModel);
-                const flyingClip = THREE.AnimationClip.findByName(gltf.animations, 'flying');
-                if (flyingClip) {
-                    this.flyingAnimationAction = this.flyingMixer.clipAction(flyingClip);
-                }
-            }
-        );
+                    onModelLoad();
+                },
+                undefined,
+                reject
+            );
+        });
     }
 
     setActiveAction(action) {

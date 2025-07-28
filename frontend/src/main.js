@@ -1,9 +1,12 @@
 // src/main.js
 import { World } from './World/World.js';
 
-function main() {
+async function main() {
     const world = new World();
-    world.init();
+    await world.init();
+
+    const loadingScreen = document.getElementById('loading-screen');
+    loadingScreen.style.display = 'none';
 }
 
 main();
