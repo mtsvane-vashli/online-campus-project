@@ -69,7 +69,7 @@ export class World {
         this.interactionUI = new InteractionUI(this.character, this.infoBoxes, this.keys);
         this.inputManager = new InputManager(this);
 
-        //this.debugger = CannonDebugger(this.scene, this.physicsWorld);
+        this.debugger = CannonDebugger(this.scene, this.physicsWorld);
 
         this.animate();
     }
@@ -77,33 +77,42 @@ export class World {
     
 
     animate() {
-        requestAnimationFrame(() => this.animate());
-        
-        const delta = this.clock.getDelta();
-        this.physicsWorld.step(PHYSICS_SETTINGS.worldStep, delta, 3);
-        
-        if (this.keys['v']) {
-            this.character.toggleFlyingMode();
-            this.keys['v'] = false;
-        }
-        
-        if (this.debugger) {
-           this.debugger.update();
-        }
-        
-        
+        const fixedTimeStep = PHYSICS_SETTINGS.worldStep;
+        let lastTime = performance.now(); // Use performance.now() for better precision
 
-        if (this.character) {
-            this.character.update(delta, this.keys, this.camera);
-            this.updateCamera();
-            this.updateLight(); // ライトの更新処理を呼び出す
-        }
+        const gameLoop = (time) => {
+            requestAnimationFrame(gameLoop);
 
-        if(this.interactionUI) {
-            this.interactionUI.update();
-        }
+            const deltaTime = (time - lastTime) / 1000; // Convert to seconds
+            lastTime = time;
 
-        this.effect.render(this.scene, this.camera);
+            // Update physics world with fixed time step
+            this.physicsWorld.step(fixedTimeStep, deltaTime, 10);
+
+            // Update character and camera
+            if (this.keys['v']) {
+                this.character.toggleFlyingMode();
+                this.keys['v'] = false;
+            }
+
+            if (this.debugger) {
+                this.debugger.update();
+            }
+
+            if (this.character) {
+                this.character.update(deltaTime, this.keys, this.camera); // Pass deltaTime to character update
+                this.updateCamera();
+                this.updateLight();
+            }
+
+            if (this.interactionUI) {
+                this.interactionUI.update();
+            }
+
+            this.effect.render(this.scene, this.camera);
+        };
+
+        gameLoop(performance.now()); // Start the game loop
     }
     
     updateLight() {

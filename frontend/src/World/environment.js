@@ -91,6 +91,7 @@ export async function createCampusEnvironment(scene, world, mode = 'day') {
                     if (shape) {
                         const body = new CANNON.Body({ mass: 0 });
                         body.addShape(shape);
+                        body.material = new CANNON.Material('groundMaterial'); // 地面のマテリアルを設定
 
                         const worldPosition = new THREE.Vector3();
                         const worldQuaternion = new THREE.Quaternion();
