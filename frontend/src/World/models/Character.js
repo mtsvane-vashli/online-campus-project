@@ -27,7 +27,7 @@ export class Character {
         });
 
         // カプセル形状をシミュレートするために、円柱と2つの半球を追加
-        const capsuleTotalHeight = 0.8; // カプセルの全体の高さ (調整可能)
+        const capsuleTotalHeight = 0.4; // カプセルの全体の高さ (調整可能)
         const cylinderHeight = capsuleTotalHeight - (2 * this.radius); // 円柱の高さ
         const sphereOffset = cylinderHeight / 2; // 半球の中心のオフセット
 

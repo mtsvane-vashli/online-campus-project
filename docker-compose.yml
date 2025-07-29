@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  # フロントエンドサービス
+  frontend:
+    build: ./frontend
+    container_name: campus_frontend_container # Nginxから参照する一意な名前
+    restart: always
+    expose:
+      - "5173" # コンテナ内部のポート
+    networks:
+      - shared_network
+
+  # バックエンドサービス
+  backend:
+    build: ./backend
+    container_name: campus_backend_container # Nginxから参照する一意な名前
+    restart: always
+    env_file:
+      - ./backend/.env # .envファイルのパス
+    expose:
+      - "3000" # コンテナ内部のポート
+    networks:
+      - shared_network
+
+# 参加する外部ネットワークを定義
+networks:
+  shared_network:
+    external: true
