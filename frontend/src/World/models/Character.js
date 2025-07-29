@@ -19,29 +19,10 @@ export class Character {
 
         this.body = new CANNON.Body({
             mass: 5,
-            position: new CANNON.Vec3(0, 0.5, 0),
-            material: new CANNON.Material('characterMaterial'), // キャラクターのマテリアルを設定
-            // CCD (Continuous Collision Detection) settings to prevent tunneling
-            ccdSweptSphereRadius: this.radius, // Set to character's radius for full swept sphere
-            ccdMotionThreshold: 0.01, // Very small threshold for maximum CCD activation
+            position: new CANNON.Vec3(0, 0, 0),
+            shape: new CANNON.Sphere(this.radius),
+            material: new CANNON.Material(),
         });
-
-        // カプセル形状をシミュレートするために、円柱と2つの半球を追加
-        const capsuleTotalHeight = 0.4; // カプセルの全体の高さ (調整可能)
-        const cylinderHeight = capsuleTotalHeight - (2 * this.radius); // 円柱の高さ
-        const sphereOffset = cylinderHeight / 2; // 半球の中心のオフセット
-
-        const cylinderShape = new CANNON.Cylinder(this.radius, this.radius, cylinderHeight, 16);
-        const sphereShape = new CANNON.Sphere(this.radius);
-
-        // 円柱を追加
-        this.body.addShape(cylinderShape, new CANNON.Vec3(0, 0, 0));
-
-        // 上の半球を追加
-        this.body.addShape(sphereShape, new CANNON.Vec3(0, sphereOffset, 0));
-
-        // 下の半球を追加
-        this.body.addShape(sphereShape, new CANNON.Vec3(0, -sphereOffset, 0));
         this.body.angularDamping = 1.0;
         this.world.addBody(this.body);
 

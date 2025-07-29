@@ -33,5 +33,5 @@ export const INFO_BOXES = [
 
 export const PHYSICS_SETTINGS = {
     gravity: { x: 0, y: -9.82, z: 0 },
-    worldStep: 1 / 120,
+    worldStep: 1 / 60,
 };
