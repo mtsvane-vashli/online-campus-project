@@ -1,6 +1,6 @@
 // frontend/src/config.js
 export const CAMERA_SETTINGS = {
-    offset: { x: 0, y: 1, z: 3 },
+    offset: { x: 0, y: 0, z: 2 },
     lookAtOffset: { y: 1 },
     raycastDistance: 8,
     collisionFilterMask: 2, // Assuming character's collision group is 1
@@ -9,7 +9,7 @@ export const CAMERA_SETTINGS = {
 export const CHARACTER_SETTINGS = {
     modelPath: '/fox.glb',
     flyingModelPath: '/dragon.glb',
-    scale: 0.01,
+    scale: 0.005,
     radius: 0.1,
     speed: {
         walk: 5,
