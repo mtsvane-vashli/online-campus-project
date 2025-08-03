@@ -47,10 +47,10 @@ export async function createCampusEnvironment(scene, world, mode = 'day') {
     directionalLight.shadow.mapSize.height = 4096;
 
     // 影のカメラの範囲を調整
-    directionalLight.shadow.camera.left = -100; // 左端
-    directionalLight.shadow.camera.right = 100; // 右端
-    directionalLight.shadow.camera.top = 100; // 上端
-    directionalLight.shadow.camera.bottom = -100; // 下端
+    directionalLight.shadow.camera.left = -50; // 左端
+    directionalLight.shadow.camera.right = 50; // 右端
+    directionalLight.shadow.camera.top = 50; // 上端
+    directionalLight.shadow.camera.bottom = -50; // 下端
     directionalLight.shadow.camera.near = 0.5; // 影の開始距離
     directionalLight.shadow.camera.far = 200; // 影の終了距離
 
