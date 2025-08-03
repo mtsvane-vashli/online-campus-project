@@ -15,6 +15,7 @@ export const CHARACTER_SETTINGS = {
         walk: 5,
         run: 10,
     },
+    terminalVelocity: 10,
 };
 
 export const INFO_BOXES = [
@@ -33,5 +34,5 @@ export const INFO_BOXES = [
 
 export const PHYSICS_SETTINGS = {
     gravity: { x: 0, y: -9.82, z: 0 },
-    worldStep: 1 / 60,
+    worldStep: 1 / 120,
 };

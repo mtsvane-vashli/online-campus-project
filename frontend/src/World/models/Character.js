@@ -19,11 +19,12 @@ export class Character {
 
         this.body = new CANNON.Body({
             mass: 5,
-            position: new CANNON.Vec3(0, 0, 0),
+            position: new CANNON.Vec3(-154.05, 6.08, 30.33),
             shape: new CANNON.Sphere(this.radius),
             material: new CANNON.Material(),
         });
         this.body.angularDamping = 1.0;
+        this.maxFallSpeed = CHARACTER_SETTINGS.terminalVelocity;
         this.world.addBody(this.body);
 
         this.inputEnabled = true;
@@ -166,6 +167,10 @@ export class Character {
             this.updateFlying(delta, keys, camera);
         } else {
             this.updateWalking(delta, keys, camera);
+        }
+
+        if (this.body.velocity.y < -this.maxFallSpeed) {
+            this.body.velocity.y = -this.maxFallSpeed;
         }
 
         activeModel.position.copy(this.body.position);
