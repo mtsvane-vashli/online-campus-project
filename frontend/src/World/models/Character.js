@@ -131,7 +131,7 @@ export class Character {
                         }
                     });
                     this.flyingMixer = new THREE.AnimationMixer(this.flyingModel);
-                    const flyingClip = THREE.AnimationClip.findByName(gltf.animations, 'flying');
+                    const flyingClip = THREE.AnimationClip.findByName(gltf.animations, 'Take 001');
                     if (flyingClip) {
                         this.flyingAnimationAction = this.flyingMixer.clipAction(flyingClip);
                     }
