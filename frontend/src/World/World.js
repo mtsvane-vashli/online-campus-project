@@ -163,39 +163,36 @@ export class World {
             // Apply camera rotation based on yaw and pitch
             this.camera.quaternion.setFromEuler(new THREE.Euler(this.cameraPitch, this.cameraYaw, 0, 'YXZ'));
 
-            // Calculate desired camera offset and direction (unit vector)
+            // Calculate desired camera position based on rotated offset
             const rotatedOffset = this.cameraOffset.clone().applyQuaternion(this.camera.quaternion);
-            const desiredDistance = rotatedOffset.length();
-            const dir = rotatedOffset.clone().normalize();
+            const desiredCameraPos = new THREE.Vector3().copy(lookAtPoint).add(rotatedOffset);
 
-            // Raycast to detect obstruction between lookAtPoint and desired position
-            const desiredCameraPos = new THREE.Vector3().copy(lookAtPoint).add(dir.clone().multiplyScalar(desiredDistance));
+            // Raycast from lookAtPoint to desired camera position to prevent clipping
             const rayFrom = new CANNON.Vec3(lookAtPoint.x, lookAtPoint.y, lookAtPoint.z);
             const rayTo = new CANNON.Vec3(desiredCameraPos.x, desiredCameraPos.y, desiredCameraPos.z);
 
             const ray = new CANNON.Ray(rayFrom, rayTo);
-            ray.collisionFilterMask = ~this.character.body.collisionFilterGroup; // Ignore character body
+            ray.collisionFilterMask = ~this.character.body.collisionFilterGroup; // Ignore character's physics body
 
-            let targetDistance = desiredDistance;
             const result = new CANNON.RaycastResult();
-            const margin = CAMERA_SETTINGS.collision.margin;
-            const minDist = CAMERA_SETTINGS.collision.minDistance;
+            const margin = (CAMERA_SETTINGS.collision && CAMERA_SETTINGS.collision.margin) ? CAMERA_SETTINGS.collision.margin : 0.5;
             if (this.physicsWorld.raycastClosest(ray.from, ray.to, {}, result)) {
+                // Collision detected. Position camera just before the hit point.
                 const hitPoint = result.hitPointWorld; // CANNON.Vec3
-                const from = rayFrom;
-                const hitDist = hitPoint.distanceTo(from);
-                targetDistance = Math.max(minDist, Math.min(desiredDistance, hitDist - margin));
+
+                // Create a direction vector from the lookAtPoint to the hitPoint
+                const direction = new CANNON.Vec3();
+                hitPoint.vsub(rayFrom, direction);
+                direction.normalize();
+
+                // Move back a little from the hit point
+                const newCamPos = hitPoint.vsub(direction.scale(margin));
+
+                this.camera.position.copy(newCamPos); // Copy from CANNON.Vec3 to THREE.Vector3
+            } else {
+                // No collision, use the desired position
+                this.camera.position.copy(desiredCameraPos);
             }
-
-            // Smoothly interpolate current camera distance toward target
-            const smoothness = CAMERA_SETTINGS.collision.smoothness; // higher = faster
-            const alpha = 1 - Math.exp(-(delta || 0.016) * smoothness);
-            this.currentCameraDistance = THREE.MathUtils.lerp(this.currentCameraDistance, targetDistance, alpha);
-            this.currentCameraDistance = Math.max(minDist, Math.min(desiredDistance, this.currentCameraDistance));
-
-            // Position the camera using the smoothed distance
-            const finalPos = new THREE.Vector3().copy(lookAtPoint).add(dir.multiplyScalar(this.currentCameraDistance));
-            this.camera.position.copy(finalPos);
         }
     }
 
