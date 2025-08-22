@@ -10,11 +10,13 @@ export class InteractionUI {
         this.infoPanel = document.getElementById('info-panel');
         this.infoPanelTitle = document.querySelector('#info-panel-content h2');
         this.infoPanelText = document.querySelector('#info-panel-content p');
+        this.actionButton = document.getElementById('action-button');
 
         this.activeInfoBox = null;
         this.openedInfoBox = null;
         this.interactionDistance = 5;
         this.eKeyPressedLastFrame = false; // Add this line
+        this.wasAvailableLastFrame = false;
 
         this.setupEventListeners();
     }
@@ -96,6 +98,20 @@ export class InteractionUI {
             this.interactionPrompt.style.display = 'block';
         } else {
             this.interactionPrompt.style.display = 'none';
+        }
+
+        // モバイル用: アクションボタンのコンテキスト強調と有効/無効
+        if (this.actionButton) {
+            const available = !!this.activeInfoBox && !this.openedInfoBox;
+            this.actionButton.classList.toggle('available', available);
+            this.actionButton.classList.toggle('disabled', !available);
+            this.actionButton.disabled = !available;
+
+            // 近接状態に入った瞬間だけバイブレーション
+            if (available && !this.wasAvailableLastFrame && window.innerWidth <= 800 && 'vibrate' in navigator) {
+                try { navigator.vibrate(30); } catch (_) {}
+            }
+            this.wasAvailableLastFrame = available;
         }
     }
 }

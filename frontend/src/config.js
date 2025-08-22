@@ -4,6 +4,11 @@ export const CAMERA_SETTINGS = {
     lookAtOffset: { y: 1 },
     raycastDistance: 8,
     collisionFilterMask: 2, // Assuming character's collision group is 1
+    collision: {
+        margin: 0.5,        // how far from hit point to place camera
+        minDistance: 0.7,   // clamp closest camera distance
+        smoothness: 10.0,   // higher = faster responsiveness
+    },
 };
 
 // Input-specific settings for camera rotation
