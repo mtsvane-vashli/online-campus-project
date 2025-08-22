@@ -6,6 +6,28 @@ export const CAMERA_SETTINGS = {
     collisionFilterMask: 2, // Assuming character's collision group is 1
 };
 
+// Input-specific settings for camera rotation
+export const INPUT_SETTINGS = {
+    mouse: {
+        camera: {
+            sensitivity: 0.002, // baseline for pointer-lock mouse
+            maxDelta: 50,
+        },
+    },
+    touch: {
+        camera: {
+            // Base sensitivity before device scaling; roughly ~3x mouse
+            sensitivity: 0.006,
+            maxDelta: 100,
+            // Scale sensitivity by DPR and screen width to keep feel consistent
+            scaleByDPR: true,
+            baseWidth: 375, // iPhone base width
+            minWidthScale: 0.9,
+            maxWidthScale: 1.3,
+        },
+    },
+};
+
 export const CHARACTER_SETTINGS = {
     modelPath: '/fox.glb',
     flyingModelPath: '/phoenix.glb',

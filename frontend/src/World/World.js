@@ -7,7 +7,7 @@ import { InfoBox } from './models/InfoBox.js';
 import { Chat } from '../UI/Chat.js';
 import { InteractionUI } from '../UI/InteractionUI.js';
 import { OutlineEffect } from './utils/OutlineEffect.js';
-import { CAMERA_SETTINGS, INFO_BOXES, PHYSICS_SETTINGS } from '../config.js';
+import { CAMERA_SETTINGS, INFO_BOXES, PHYSICS_SETTINGS, INPUT_SETTINGS } from '../config.js';
 import CannonDebugger from './utils/cannon-debugger.js'; // デバッガーをインポート
 
 import { InputManager } from '../InputManager.js';
@@ -119,9 +119,29 @@ export class World {
         }
     }
 
-    handleCameraRotation(deltaX, deltaY) {
-        const sensitivity = 0.002; // Adjust as needed
-        const maxDelta = 50; // Maximum allowed delta value to prevent sudden jumps
+    handleCameraRotation(deltaX, deltaY, inputType = 'mouse') {
+        // Select sensitivity based on input type
+        let sensitivity = INPUT_SETTINGS.mouse.camera.sensitivity;
+        let maxDelta = INPUT_SETTINGS.mouse.camera.maxDelta;
+
+        if (inputType === 'touch') {
+            const touchConf = INPUT_SETTINGS.touch.camera;
+            sensitivity = touchConf.sensitivity;
+            maxDelta = touchConf.maxDelta;
+
+            // Apply DPR and viewport-width scaling to touch sensitivity
+            let multiplier = 1.0;
+            if (touchConf.scaleByDPR && typeof window !== 'undefined') {
+                const dpr = window.devicePixelRatio || 1;
+                const width = window.innerWidth || touchConf.baseWidth;
+                const widthScaleRaw = width / touchConf.baseWidth;
+                const widthScale = Math.max(touchConf.minWidthScale, Math.min(touchConf.maxWidthScale, widthScaleRaw));
+                multiplier = dpr * widthScale;
+            }
+            sensitivity *= multiplier;
+            // Increase clamp slightly with multiplier to avoid over-clamping on high-DPR
+            maxDelta = Math.max(maxDelta, maxDelta * (multiplier / 2));
+        }
 
         // Clamp deltaX and deltaY to prevent extreme values
         deltaX = Math.max(-maxDelta, Math.min(maxDelta, deltaX));

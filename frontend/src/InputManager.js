@@ -108,7 +108,7 @@ export class InputManager {
 
     onMouseMove(e) {
         if (document.pointerLockElement === document.body) {
-            this.world.handleCameraRotation(e.movementX, e.movementY);
+            this.world.handleCameraRotation(e.movementX, e.movementY, 'mouse');
         }
     }
 
@@ -203,7 +203,7 @@ export class InputManager {
         const deltaX = touch.clientX - this.touchState.camera.startX;
         const deltaY = touch.clientY - this.touchState.camera.startY;
 
-        this.world.handleCameraRotation(deltaX, deltaY);
+        this.world.handleCameraRotation(deltaX, deltaY, 'touch');
 
         this.touchState.camera.startX = touch.clientX;
         this.touchState.camera.startY = touch.clientY;
