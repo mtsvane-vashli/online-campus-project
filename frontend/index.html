@@ -214,11 +214,56 @@
 
         /* Default hide for PC */
         #joystick-container,
-        #action-button-container {
+        #action-button-container,
+        #flight-toggle-button-container,
+        #flight-vertical-controls {
             display: none;
         }
 
         @media (max-width: 800px) {
+            /* Mobile: flight toggle */
+            #flight-toggle-button-container {
+                display: block;
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                z-index: 120;
+            }
+
+            #flight-toggle-button {
+                width: 60px;
+                height: 60px;
+                font-size: 14px;
+                border-radius: 50%;
+                background-color: rgba(255, 165, 0, 0.9); /* orange */
+                border: none;
+                color: white;
+                box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            }
+
+            /* Mobile: ascend/descend buttons shown under toggle */
+            #flight-vertical-controls {
+                display: flex;
+                flex-direction: column;
+                gap: 12px;
+                position: fixed;
+                top: 100px;
+                right: 20px;
+                z-index: 120;
+            }
+            #ascend-button,
+            #descend-button {
+                width: 56px;
+                height: 56px;
+                border-radius: 50%;
+                border: none;
+                color: white;
+                background-color: rgba(33, 150, 243, 0.9); /* blue */
+                box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+                font-size: 20px;
+            }
+            #descend-button { background-color: rgba(76, 175, 80, 0.9); } /* green */
+
             #joystick-container {
                 display: block;
                 position: fixed;
@@ -290,6 +335,13 @@
         <div id="joystick-base">
             <div id="joystick-stick"></div>
         </div>
+    </div>
+    <div id="flight-toggle-button-container">
+        <button id="flight-toggle-button" aria-label="飛行モード切替">飛行</button>
+    </div>
+    <div id="flight-vertical-controls">
+        <button id="ascend-button" aria-label="上昇">↑</button>
+        <button id="descend-button" aria-label="下降">↓</button>
     </div>
     <div id="action-button-container">
         <button id="action-button">A</button>

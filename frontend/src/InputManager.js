@@ -27,12 +27,46 @@ export class InputManager {
         const joystickBase = document.getElementById('joystick-base');
         const joystickStick = document.getElementById('joystick-stick');
         const actionButton = document.getElementById('action-button');
+        const flightToggleButton = document.getElementById('flight-toggle-button');
+        const ascendButton = document.getElementById('ascend-button');
+        const descendButton = document.getElementById('descend-button');
 
         joystickBase.addEventListener('touchstart', (e) => this.onJoystickTouchStart(e), { passive: false });
         joystickBase.addEventListener('touchmove', (e) => this.onJoystickTouchMove(e), { passive: false });
         joystickBase.addEventListener('touchend', (e) => this.onJoystickTouchEnd(e), { passive: false });
 
         actionButton.addEventListener('touchend', (e) => this.onActionButtonTouchEnd(e));
+
+        if (flightToggleButton) {
+            // Support both touch and click for broader device compatibility
+            const onToggle = (e) => {
+                e.preventDefault();
+                if (this.world && this.world.character) {
+                    this.world.character.toggleFlyingMode();
+                    // Simple visual feedback: toggle active state text
+                    const isFlying = this.world.character.isFlying;
+                    flightToggleButton.textContent = isFlying ? '降りる' : '飛行';
+                }
+            };
+            flightToggleButton.addEventListener('touchend', onToggle, { passive: false });
+            flightToggleButton.addEventListener('click', onToggle);
+        }
+
+        // Vertical controls for flying on mobile
+        const bindHoldButton = (el, key) => {
+            if (!el) return;
+            const onStart = (e) => { e.preventDefault(); this.keys[key] = true; };
+            const onEnd = (e) => { e.preventDefault(); this.keys[key] = false; };
+            el.addEventListener('touchstart', onStart, { passive: false });
+            el.addEventListener('touchend', onEnd, { passive: false });
+            el.addEventListener('touchcancel', onEnd, { passive: false });
+            el.addEventListener('mousedown', onStart);
+            el.addEventListener('mouseup', onEnd);
+            el.addEventListener('mouseleave', onEnd);
+        };
+        // Space for ascend, 'c' for descend (matches Character.updateFlying)
+        bindHoldButton(ascendButton, ' ');
+        bindHoldButton(descendButton, 'c');
 
         // Camera touch controls
         this.world.renderer.domElement.addEventListener('touchstart', (e) => this.onRendererTouchStart(e), { passive: false });
@@ -132,7 +166,14 @@ export class InputManager {
 
     onRendererTouchStart(e) {
         const targetId = e.target.id;
-        if (targetId.includes('joystick') || targetId.includes('action-button') || targetId.includes('chat')) {
+        if (
+            targetId.includes('joystick') ||
+            targetId.includes('action-button') ||
+            targetId.includes('chat') ||
+            targetId.includes('flight-toggle-button') ||
+            targetId.includes('ascend') ||
+            targetId.includes('descend')
+        ) {
             return;
         }
 
