@@ -1,8 +1,7 @@
 // src/World/environment.js
 import * as THREE from 'three';
 import * as CANNON from 'cannon-es';
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
-import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js';
+import { createGLTFLoader } from '../utils/AssetLoader.js';
 import { threeToCannon } from './utils/three-to-cannon.js'; // 物理メッシュ変換用のヘルパー
 
 // 非同期関数として定義
@@ -60,18 +59,7 @@ export async function createCampusEnvironment(scene, world, mode = 'day') {
     const PHYSICS_SCALE_MULTIPLIER = 1; // 物理シミュレーションのスケール調整用
 
     // Campus Model Loading
-    const gltfLoader = new GLTFLoader(); // ◀ loaderからgltfLoaderに名前を変更（任意）
-    
-    // --- ▼ここから追加 ---
-    const dracoLoader = new DRACOLoader();
-    // デコーダーのパスを設定します。CDNを使うのが簡単で確実です。
-    dracoLoader.setDecoderPath('https://www.gstatic.com/draco/v1/decoders/');
-    // 自分のプロジェクト内にdecoderを配置する場合は以下のようになります
-    // dracoLoader.setDecoderPath('/draco-decoder/'); 
-
-    // GLTFLoaderにDracoLoaderを「鍵」として登録します
-    gltfLoader.setDRACOLoader(dracoLoader);
-    // --- ▲ここまで追加 ---
+    const gltfLoader = createGLTFLoader();
 
     try {
         // 設定済みのローダーでモデルを読み込みます

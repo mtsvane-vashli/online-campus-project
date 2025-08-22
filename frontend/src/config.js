@@ -63,3 +63,36 @@ export const PHYSICS_SETTINGS = {
     gravity: { x: 0, y: -9.82, z: 0 },
     worldStep: 1 / 120,
 };
+
+// Quality tiers for rendering; switch at runtime by device conditions
+export const QUALITY_SETTINGS = {
+    high: {
+        maxPixelRatio: 2,
+        shadowMapSize: 4096,
+        useOutline: true,
+    },
+    medium: {
+        maxPixelRatio: 1.5,
+        shadowMapSize: 2048,
+        useOutline: true,
+    },
+    low: {
+        maxPixelRatio: 1,
+        shadowMapSize: 1024,
+        useOutline: false,
+    },
+};
+
+export function pickQualityTier() {
+    const isMobile = typeof window !== 'undefined' && window.innerWidth <= 800;
+    const dpr = typeof window !== 'undefined' ? (window.devicePixelRatio || 1) : 1;
+    // Simple heuristic: mobile→medium、超低スペック→low、その他→high
+    if (isMobile && dpr <= 1) return 'low';
+    if (isMobile) return 'medium';
+    return 'high';
+}
+
+export const ASSET_PATHS = {
+    // Place decoder files under /public/draco/ to self-host; fallback is gstatic
+    dracoDecoderPath: 'https://www.gstatic.com/draco/v1/decoders/',
+};

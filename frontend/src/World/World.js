@@ -7,7 +7,8 @@ import { InfoBox } from './models/InfoBox.js';
 import { Chat } from '../UI/Chat.js';
 import { InteractionUI } from '../UI/InteractionUI.js';
 import { OutlineEffect } from './utils/OutlineEffect.js';
-import { CAMERA_SETTINGS, INFO_BOXES, PHYSICS_SETTINGS, INPUT_SETTINGS } from '../config.js';
+import { CAMERA_SETTINGS, INFO_BOXES, PHYSICS_SETTINGS, INPUT_SETTINGS, QUALITY_SETTINGS, pickQualityTier } from '../config.js';
+import { get as getSetting } from '../utils/Settings.js';
 import CannonDebugger from './utils/cannon-debugger.js'; // デバッガーをインポート
 
 import { InputManager } from '../InputManager.js';
@@ -41,20 +42,30 @@ export class World {
         this.chat = null;
         this.debugger = null; // デバッガー用のプロパティを追加
         this.effect = null; // OutlineEffect
+        this.useOutline = true;
+        this.qualityTier = 'high';
         this.directionalLight = null; // 指向性ライト
         this.inputManager = null;
     }
 
     async init(mode = 'day') {
+        // Pick quality tier and apply
+        this.qualityTier = pickQualityTier();
+        const q = QUALITY_SETTINGS[this.qualityTier];
+
         const renderer = new THREE.WebGLRenderer({ antialias: true });
-        renderer.setPixelRatio(window.devicePixelRatio);
+        const cappedPR = Math.min(window.devicePixelRatio || 1, q.maxPixelRatio);
+        renderer.setPixelRatio(cappedPR);
         renderer.setSize(window.innerWidth, window.innerHeight);
         renderer.setClearColor(0x87ceeb);
         renderer.shadowMap.enabled = true;
         document.body.appendChild(renderer.domElement);
         this.renderer = renderer;
 
-        this.effect = new OutlineEffect(this.renderer);
+        this.useOutline = !!q.useOutline;
+        if (this.useOutline) {
+            this.effect = new OutlineEffect(this.renderer);
+        }
 
         this.directionalLight = await createCampusEnvironment(this.scene, this.physicsWorld, mode);
         this.character = new Character(this.scene, this.physicsWorld);
@@ -69,6 +80,12 @@ export class World {
         this.chat = new Chat();
         this.interactionUI = new InteractionUI(this.character, this.infoBoxes, this.keys);
         this.inputManager = new InputManager(this);
+
+        // Apply quality to lights (shadow map size)
+        if (this.directionalLight && this.directionalLight.shadow) {
+            this.directionalLight.shadow.mapSize.width = q.shadowMapSize;
+            this.directionalLight.shadow.mapSize.height = q.shadowMapSize;
+        }
 
         //this.debugger = CannonDebugger(this.scene, this.physicsWorld);
 
@@ -104,7 +121,11 @@ export class World {
             this.interactionUI.update();
         }
 
-        this.effect.render(this.scene, this.camera);
+        if (this.useOutline && this.effect) {
+            this.effect.render(this.scene, this.camera);
+        } else {
+            this.renderer.render(this.scene, this.camera);
+        }
     }
     
     updateLight() {
@@ -148,8 +169,15 @@ export class World {
         deltaX = Math.max(-maxDelta, Math.min(maxDelta, deltaX));
         deltaY = Math.max(-maxDelta, Math.min(maxDelta, deltaY));
 
+        const invertY = !!getSetting('invertY');
+        const mouseSens = getSetting('mouseSensitivity');
+        const touchSens = getSetting('touchSensitivity');
+        if (inputType === 'mouse' && typeof mouseSens === 'number') sensitivity = mouseSens;
+        if (inputType === 'touch' && typeof touchSens === 'number') sensitivity = touchSens * (sensitivity / INPUT_SETTINGS.touch.camera.sensitivity);
+
         this.cameraYaw -= deltaX * sensitivity;
-        this.cameraPitch -= deltaY * sensitivity;
+        const yFactor = invertY ? -1 : 1;
+        this.cameraPitch -= (deltaY * yFactor) * sensitivity;
 
         // Clamp pitch to prevent camera from flipping upside down
         this.cameraPitch = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, this.cameraPitch));

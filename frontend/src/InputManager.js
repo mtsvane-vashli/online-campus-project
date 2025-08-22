@@ -1,5 +1,6 @@
 // frontend/src/InputManager.js
 import * as THREE from 'three';
+import { get as getSetting } from './utils/Settings.js';
 
 export class InputManager {
     constructor(world) {
@@ -220,8 +221,9 @@ export class InputManager {
     }
 
     updateKeysFromJoystick(deltaX, deltaY) {
-        const moveThreshold = 20;
-        const runThreshold = 50;
+        // Settings-driven thresholds
+        const moveThreshold = getSetting('joystickDeadzone') ?? 20;
+        const runThreshold = getSetting('joystickRunThreshold') ?? 50;
 
         this.keys['w'] = deltaY < -moveThreshold;
         this.keys['s'] = deltaY > moveThreshold;
