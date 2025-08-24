@@ -63,7 +63,7 @@ export async function createCampusEnvironment(scene, world, mode = 'day') {
 
     try {
         // 設定済みのローダーでモデルを読み込みます
-        const gltf = await gltfLoader.loadAsync('/Kyushu_University_beta6.glb');
+        const gltf = await gltfLoader.loadAsync('/Kyushu_University_beta7.glb');
         const campusModel = gltf.scene;
         
         // モデルをシーンに追加
